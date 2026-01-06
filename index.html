@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Alergias a Alimentos - Detección de Alergenos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>🔍 Detección de Alergenos en Alimentos</h1>
+            <p>Sistema de Registro de Alergias Alimentarias</p>
+        </header>
+
+        <main>
+            <section class="formulario-seccion">
+                <h2>Formulario de Registro</h2>
+                
+                <form id="formularioRegistro" method="POST" action="api/registrar_usuario.php" novalidate>
+                    <!-- Información Personal -->
+                    <fieldset>
+                        <legend>Información Personal</legend>
+                        
+                        <div class="grupo-formulario">
+                            <label for="nombre">Nombre Completo:</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan García López">
+                            <span class="error" id="errorNombre"></span>
+                        </div>
+
+                        <div class="grupo-formulario">
+                            <label for="email">Correo Electrónico:</label>
+                            <input type="email" id="email" name="email" required placeholder="Ej: juan@ejemplo.com">
+                            <span class="error" id="errorEmail"></span>
+                        </div>
+
+                        <div class="grupo-formulario">
+                            <label for="telefono">Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" required placeholder="Ej: +34 123 456 789">
+                            <span class="error" id="errorTelefono"></span>
+                        </div>
+
+                        <div class="grupo-formulario">
+                            <label for="edad">Edad:</label>
+                            <input type="number" id="edad" name="edad" required min="1" max="120" placeholder="Ej: 30">
+                            <span class="error" id="errorEdad"></span>
+                        </div>
+
+                        <div class="grupo-formulario">
+                            <label for="genero">Género:</label>
+                            <select id="genero" name="genero" required>
+                                <option value="">-- Selecciona una opción --</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                                <option value="prefiero_no_decir">Prefiero no decir</option>
+                            </select>
+                            <span class="error" id="errorGenero"></span>
+                        </div>
+                    </fieldset>
+
+                    <!-- Alergias Alimentarias -->
+                    <fieldset>
+                        <legend>Alergias Alimentarias</legend>
+
+                        <div class="grupo-formulario">
+                            <label>Alergenos Alimentarios:</label>
+                            <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Selecciona todos los alimentos a los que eres alérgico</p>
+                            <div class="checkboxes-container">
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="1">
+                                    Gluten
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="2">
+                                    Lactosa
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="3">
+                                    Frutos Secos
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="4">
+                                    Maní/Cacahuate
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="5">
+                                    Huevo
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="6">
+                                    Pescado
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="7">
+                                    Crustáceos
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="8">
+                                    Soja
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="9">
+                                    Mostaza
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="10">
+                                    Ajonjolí/Sésamo
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="11">
+                                    Moluscos
+                                </label>
+                                <label class="label-checkbox">
+                                    <input type="checkbox" name="alergenos" value="12">
+                                    Conservantes/Sulfitos
+                                </label>
+                            </div>
+                            <span class="error" id="errorAlergenos"></span>
+                        </div>
+
+                        <div class="grupo-formulario">
+                            <label>¿Hay alergias seleccionadas?</label>
+                            <p id="resumenAlergenos" style="color: #667eea; font-weight: bold; min-height: 20px;">Ninguna seleccionada</p>
+                        </div>
+
+                        <!-- Gravedad por alergeno -->
+                        <div id="gravedadAlergenos" style="display: none;">
+                            <div class="grupo-formulario">
+                                <label for="gravedadAlergena">Gravedad General de tus Alergias:</label>
+                                <select id="gravedadAlergena" name="gravedad" required>
+                                    <option value="">-- Selecciona una opción --</option>
+                                    <option value="leve">🟢 Leve (Picazón, irritación leve)</option>
+                                    <option value="moderada">🟡 Moderada (Hinchazón, urticaria)</option>
+                                    <option value="severa">🔴 Severa (Anafilaxis, dificultad respiratoria)</option>
+                                </select>
+                                <span class="error" id="errorGravedad"></span>
+                            </div>
+
+                            <div class="grupo-formulario">
+                                <label for="observaciones">Observaciones Médicas:</label>
+                                <textarea id="observaciones" name="observaciones" rows="3" placeholder="Describe cualquier información médica relevante..."></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Términos y Condiciones -->
+                    <fieldset>
+                        <legend>Consentimiento</legend>
+                        
+                        <label class="label-checkbox">
+                            <input type="checkbox" id="terminos" name="terminos" required>
+                            Acepto los términos y condiciones y autorizo el almacenamiento de mis datos de alergia
+                        </label>
+                        <span class="error" id="errorTerminos"></span>
+                    </fieldset>
+
+                    <!-- Botones -->
+                    <div class="botones-grupo">
+                        <button type="submit" class="boton boton-primario">✓ Registrarse</button>
+                        <button type="reset" class="boton boton-secundario">🔄 Limpiar Formulario</button>
+                    </div>
+
+                    <!-- Mensajes de éxito/error -->
+                    <div id="mensajeExito" class="mensaje exito" style="display: none;">
+                        ✓ ¡Registro completado exitosamente! Redireccionando...
+                    </div>
+                    <div id="mensajeError" class="mensaje error-msg" style="display: none;">
+                        ✗ Error en el registro. Por favor, intenta de nuevo.
+                    </div>
+                </form>
+            </section>
+
+            <!-- Enlace al escáner -->
+            <section class="enlace-registros">
+                <p><strong>¿Listo para escanear productos?</strong></p>
+                <a href="scanner.html" class="boton boton-primario">🔍 Ir al Escáner de Alimentos</a>
+                <a href="listar.php" class="boton boton-info">📋 Ver Registros</a>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Sistema de Detección de Alergenos. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
