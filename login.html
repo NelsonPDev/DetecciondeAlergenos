@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Detección de Alergenos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .registro-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .registro-link p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .registro-link a {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #17a2b8;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .registro-link a:hover {
+            background: #138496;
+        }
+
+        .mensaje-exito {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mensaje-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .remember-me label {
+            margin-bottom: 0;
+            font-size: 0.9em;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .contenedor {
+            max-width: 100%;
+            margin: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: transparent;
+            color: white;
+        }
+
+        header h1 {
+            color: white;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        main {
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>🔍 Detección de Alergenos</h1>
+            <p>Sistema de Escaneo de Alimentos</p>
+        </header>
+
+        <main>
+            <div class="login-container">
+                <div class="login-header">
+                    <h1>Iniciar Sesión</h1>
+                    <p>Accede a tu cuenta</p>
+                </div>
+
+                <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
+                <div id="mensajeExito" class="mensaje-exito" style="display: none;"></div>
+
+                <form id="formularioLogin" onsubmit="iniciarSesion(event)">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="email" id="email" name="email" required placeholder="tu@correo.com">
+                        <div class="error-message" id="errorEmail"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" name="password" required placeholder="Tu contraseña">
+                        <div class="error-message" id="errorPassword"></div>
+                    </div>
+
+                    <div class="remember-me">
+                        <input type="checkbox" id="recordarme" name="recordarme">
+                        <label for="recordarme">Recuérdame en este dispositivo</label>
+                    </div>
+
+                    <button type="submit" class="login-button">🔓 Iniciar Sesión</button>
+                </form>
+
+                <div class="registro-link">
+                    <p>¿No tienes cuenta?</p>
+                    <a href="registro.html">Crear una nueva cuenta</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Verificar si el usuario ya está logueado
+        function verificarSesionExistente() {
+            fetch('api/verificar_sesion.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logueado) {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Verificar al cargar la página
+        window.addEventListener('load', verificarSesionExistente);
+
+        // Manejar el envío del formulario
+        async function iniciarSesion(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const recordarme = document.getElementById('recordarme').checked;
+
+            // Limpiar mensajes previos
+            document.getElementById('mensajeError').style.display = 'none';
+            document.getElementById('mensajeExito').style.display = 'none';
+            limpiarErrores();
+
+            // Validar campos
+            if (!email || !password) {
+                mostrarError('email', 'Completa todos los campos');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('recordarme', recordarme ? 'true' : 'false');
+
+                const response = await fetch('api/login.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.exito) {
+                    document.getElementById('mensajeExito').textContent = '✓ ' + resultado.mensaje;
+                    document.getElementById('mensajeExito').style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    document.getElementById('mensajeError').textContent = '✗ ' + resultado.mensaje;
+                    document.getElementById('mensajeError').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('mensajeError').textContent = '✗ Error al procesar la solicitud';
+                document.getElementById('mensajeError').style.display = 'block';
+            }
+        }
+
+        function mostrarError(campo, mensaje) {
+            const elemento = document.getElementById('error' + campo.charAt(0).toUpperCase() + campo.slice(1));
+            if (elemento) {
+                elemento.textContent = mensaje;
+            }
+        }
+
+        function limpiarErrores() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        // Validación en tiempo real
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !regexEmail.test(email)) {
+                mostrarError('email', 'Correo inválido');
+            } else {
+                document.getElementById('errorEmail').textContent = '';
+            }
+        });
+
+        document.getElementById('password').addEventListener('blur', function() {
+            if (this.value.length < 6) {
+                mostrarError('password', 'La contraseña debe tener al menos 6 caracteres');
+            } else {
+                document.getElementById('errorPassword').textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -205,25 +205,26 @@
         </header>
 
         <main>
-            <!-- Selector de Usuario -->
-            <section class="formulario-seccion">
-                <h2>Selecciona tu Perfil</h2>
-
-                <div class="grupo-formulario">
-                    <label for="selectUsuario">Usuario:</label>
-                    <select id="selectUsuario">
-                        <option value="">-- Sin perfil de usuario --</option>
-                    </select>
-                    <small style="color: #666; margin-top: 5px;">Selecciona un usuario para destacar sus alergenos</small>
-                </div>
-
-                <!-- Perfil del usuario seleccionado -->
-                <div id="perfilUsuario" style="display: none;">
-                    <div class="perfil-usuario">
-                        <h3 id="nombreUsuario"></h3>
-                        <p>Tus alergenos:</p>
-                        <div class="alergias-usuario" id="alergenuarioContainer"></div>
+            <!-- Header con usuario logueado -->
+            <section class="formulario-seccion" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="margin: 0; color: white;">Tu Perfil</h2>
+                        <h3 id="nombreUsuarioHeader" style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9);"></h3>
+                        <p id="emailUsuarioHeader" style="margin: 5px 0 0 0; color: rgba(255,255,255,0.8);"></p>
                     </div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="index.html" style="padding: 10px 20px; background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 6px; color: white; text-decoration: none; cursor: pointer;">← Mi Perfil</a>
+                        <button onclick="cerrarSesion()" style="padding: 10px 20px; background: #dc3545; border: none; border-radius: 6px; color: white; cursor: pointer;">🚪 Salir</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Perfil del usuario -->
+            <section class="formulario-seccion">
+                <h2>Mis Alergenos</h2>
+                <div class="perfil-usuario" id="perfilUsuario">
+                    <p>Cargando tus alergenos...</p>
                 </div>
             </section>
 
@@ -279,8 +280,7 @@
 
             <!-- Botones de Navegación -->
             <section class="enlace-registros">
-                <a href="index.html" class="boton boton-info">← Volver al Registro</a>
-                <a href="listar.php" class="boton boton-info">📋 Ver Usuarios</a>
+                <a href="index.html" class="boton boton-info">← Volver al Perfil</a>
             </section>
         </main>
 

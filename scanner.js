@@ -1,101 +1,103 @@
-// scanner.js - Lógica del escáner de alergenos
+// scanner.js - Lógica del escáner de alergenos con sesiones
 
 let usuarioActual = null;
+let usuarioId = null;
 let historialEscaneos = [];
 
-// Cargar usuarios al iniciar
-document.addEventListener('DOMContentLoaded', function() {
-    cargarUsuarios();
-    cargarAlergenos();
-    restaurarHistorial();
+// Verificar sesión y cargar datos al iniciar
+document.addEventListener('DOMContentLoaded', async function() {
+    await verificarSesion();
 });
 
-// Cargar lista de usuarios
-function cargarUsuarios() {
-    fetch('api/obtener_usuarios.php')
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById('selectUsuario');
-            if (data.exito && data.usuarios) {
-                data.usuarios.forEach(usuario => {
-                    const option = document.createElement('option');
-                    option.value = usuario.id;
-                    option.textContent = usuario.nombre;
-                    option.dataset.usuario = JSON.stringify(usuario);
-                    select.appendChild(option);
-                });
-            }
-        })
-        .catch(error => console.error('Error al cargar usuarios:', error));
+// Verificar sesión del usuario
+async function verificarSesion() {
+    try {
+        const response = await fetch('api/verificar_sesion.php');
+        const data = await response.json();
+
+        if (!data.logueado) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        usuarioId = data.usuario.id;
+        document.getElementById('nombreUsuarioHeader').textContent = data.usuario.nombre;
+        document.getElementById('emailUsuarioHeader').textContent = data.usuario.email;
+
+        // Cargar datos del usuario
+        await cargarUsuarioActual(usuarioId);
+        await cargarAlergenos();
+        restaurarHistorial();
+    } catch (error) {
+        console.error('Error al verificar sesión:', error);
+        window.location.href = 'login.html';
+    }
 }
 
-// Manejar selección de usuario
-document.getElementById('selectUsuario').addEventListener('change', function() {
-    if (this.value) {
-        const option = this.options[this.selectedIndex];
-        usuarioActual = JSON.parse(option.dataset.usuario);
-        mostrarPerfilUsuario(usuarioActual);
-    } else {
-        usuarioActual = null;
-        document.getElementById('perfilUsuario').style.display = 'none';
+// Cargar datos del usuario actual
+async function cargarUsuarioActual(id) {
+    try {
+        const response = await fetch(`api/obtener_usuario.php?id=${id}`);
+        const usuario = await response.json();
+
+        if (usuario) {
+            usuarioActual = usuario;
+            await mostrarPerfilUsuario(usuario);
+        }
+    } catch (error) {
+        console.error('Error al cargar usuario:', error);
     }
-});
+}
 
-// Mostrar perfil del usuario seleccionado
-function mostrarPerfilUsuario(usuario) {
+// Mostrar perfil del usuario
+async function mostrarPerfilUsuario(usuario) {
     const perfilDiv = document.getElementById('perfilUsuario');
-    const nombreDiv = document.getElementById('nombreUsuario');
-    const alergenuarioDiv = document.getElementById('alergenuarioContainer');
+    let html = `<h3>${usuario.nombre} (${usuario.edad} años)</h3><p>Tus alergenos:</p><div class="alergias-usuario" id="alergenuarioContainer">`;
 
-    nombreDiv.textContent = usuario.nombre + ' (' + usuario.edad + ' años)';
-    
-    // Cargar alergenos del usuario
-    fetch('api/obtener_alergenos_usuario.php?usuario_id=' + usuario.id)
-        .then(response => response.json())
-        .then(data => {
-            alergenuarioDiv.innerHTML = '';
-            if (data.exito && data.alergenos) {
-                if (data.alergenos.length === 0) {
-                    alergenuarioDiv.innerHTML = '<p style="color: #90EE90;">✓ Sin alergenos registrados</p>';
-                } else {
-                    data.alergenos.forEach(alergeno => {
-                        const chip = document.createElement('div');
-                        chip.className = 'chip-alergia ' + (alergeno.gravedad || 'leve');
-                        chip.textContent = alergeno.nombre;
-                        alergenuarioDiv.appendChild(chip);
-                    });
-                }
-            }
-            perfilDiv.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alergenuarioDiv.innerHTML = '<p style="color: #999;">Error al cargar alergenos</p>';
-        });
+    try {
+        const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuario.id}`);
+        const alergenos = await response.json();
+
+        if (Array.isArray(alergenos) && alergenos.length > 0) {
+            alergenos.forEach(alergeno => {
+                html += `<div class="chip-alergia ${alergeno.gravedad}">${alergeno.nombre}</div>`;
+            });
+        } else {
+            html += '<p style="color: #90EE90;">✓ Sin alergenos registrados</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        html += '<p style="color: #999;">Error al cargar alergenos</p>';
+    }
+
+    html += '</div>';
+    perfilDiv.innerHTML = html;
 }
 
 // Cargar tabla de alergenos
-function cargarAlergenos() {
-    fetch('api/obtener_alergenos.php')
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('tablaAlergenosBody');
-            if (data.exito && data.alergenos) {
-                data.alergenos.forEach(alergeno => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${alergeno.nombre}</strong></td>
-                        <td>${alergeno.descripcion || 'Sin descripción'}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        })
-        .catch(error => console.error('Error al cargar alergenos:', error));
+async function cargarAlergenos() {
+    try {
+        const response = await fetch('api/obtener_alergenos.php');
+        const data = await response.json();
+
+        const tbody = document.getElementById('tablaAlergenosBody');
+        if (data.exito && data.alergenos) {
+            data.alergenos.forEach(alergeno => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${alergeno.nombre}</strong></td>
+                    <td>${alergeno.descripcion || 'Sin descripción'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (error) {
+        console.error('Error al cargar alergenos:', error);
+    }
 }
 
 // Buscar producto por código de barras
-function buscarProducto() {
+async function buscarProducto() {
     const codigo = document.getElementById('codigoBarras').value.trim();
     
     if (!codigo) {
@@ -108,27 +110,27 @@ function buscarProducto() {
     resultadoDiv.style.display = 'block';
     resultadoDiv.innerHTML = '<p style="text-align: center; color: #667eea;"><strong>Buscando producto...</strong></p>';
 
-    // Buscar en la base de datos
-    fetch('api/buscar_producto.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'codigo_barras=' + encodeURIComponent(codigo)
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const formData = new FormData();
+        formData.append('codigo_barras', codigo);
+        formData.append('usuario_id', usuarioId);
+
+        const response = await fetch('api/buscar_producto.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
         mostrarResultado(data, codigo);
         agregarHistorial(codigo, data);
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         resultadoDiv.innerHTML = '<p style="color: red;">Error al buscar el producto</p>';
-    });
+    }
 }
 
 // Mostrar resultado de la búsqueda
-function mostrarResultado(data, codigo) {
+async function mostrarResultado(data, codigo) {
     const resultadoDiv = document.getElementById('resultadoContainer');
     let html = '';
 
@@ -143,13 +145,14 @@ function mostrarResultado(data, codigo) {
             </div>
         `;
 
+        // Obtener alergenos del usuario actual
+        const alergasUsuario = await obtenerAlergosUsuario(usuarioId);
+
         if (data.alergenos && data.alergenos.length > 0) {
             html += '<h4 style="color: #dc3545;">⚠️ Alergenos Detectados:</h4>';
             
             data.alergenos.forEach(alergeno => {
-                const tieneAlergeno = usuarioActual ? 
-                    usuarioActual.alergenos && usuarioActual.alergenos.includes(alergeno.id) : 
-                    false;
+                const tieneAlergeno = alergasUsuario.some(a => a.id === alergeno.id);
 
                 html += `
                     <div class="alergeno-encontrado">
@@ -171,6 +174,17 @@ function mostrarResultado(data, codigo) {
     }
 
     resultadoDiv.innerHTML = html;
+}
+
+// Obtener alergenos del usuario
+async function obtenerAlergosUsuario(usuarioId) {
+    try {
+        const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuarioId}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        return [];
+    }
 }
 
 // Agregar al historial
@@ -246,9 +260,30 @@ function limpiarResultado() {
     document.getElementById('codigoBarras').focus();
 }
 
+// Cerrar sesión
+async function cerrarSesion() {
+    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        try {
+            const response = await fetch('api/logout.php');
+            const data = await response.json();
+            if (data.exito) {
+                window.location.href = 'login.html';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+        }
+    }
+}
+
 // Permitir buscar presionando Enter
-document.getElementById('codigoBarras').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        buscarProducto();
+document.addEventListener('DOMContentLoaded', function() {
+    const inputCodigo = document.getElementById('codigoBarras');
+    if (inputCodigo) {
+        inputCodigo.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarProducto();
+            }
+        });
     }
 });

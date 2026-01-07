@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Detección de Alergenos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .registro-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .registro-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .registro-header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .registro-header p {
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+
+        .registro-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .registro-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .login-link p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .login-link a {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            background: #5a6268;
+        }
+
+        .mensaje-exito {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mensaje-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .requisitos {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #0c5460;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .contenedor {
+            max-width: 100%;
+            margin: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: transparent;
+            color: white;
+        }
+
+        header h1 {
+            color: white;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        main {
+            padding: 0;
+        }
+
+        .dos-columnas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .dos-columnas {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>🔍 Detección de Alergenos</h1>
+            <p>Sistema de Escaneo de Alimentos</p>
+        </header>
+
+        <main>
+            <div class="registro-container">
+                <div class="registro-header">
+                    <h1>Crear Cuenta</h1>
+                    <p>Regístrate para empezar</p>
+                </div>
+
+                <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
+                <div id="mensajeExito" class="mensaje-exito" style="display: none;"></div>
+
+                <div class="requisitos">
+                    <strong>Requisitos de contraseña:</strong>
+                    <ul style="margin: 8px 0 0 20px;">
+                        <li>Mínimo 6 caracteres</li>
+                        <li>Incluir al menos una mayúscula</li>
+                        <li>Incluir al menos un número</li>
+                    </ul>
+                </div>
+
+                <form id="formularioRegistro" onsubmit="registrarUsuario(event)">
+                    <div class="dos-columnas">
+                        <div class="form-group">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+                            <div class="error-message" id="errorNombre"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edad">Edad:</label>
+                            <input type="number" id="edad" name="edad" required min="13" max="120" placeholder="Tu edad">
+                            <div class="error-message" id="errorEdad"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="email" id="email" name="email" required placeholder="tu@correo.com">
+                        <div class="error-message" id="errorEmail"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono:</label>
+                        <input type="tel" id="telefono" name="telefono" required placeholder="+34 600000000">
+                        <div class="error-message" id="errorTelefono"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="genero">Género:</label>
+                        <select id="genero" name="genero" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                            <option value="prefiero_no_decir">Prefiero no decir</option>
+                        </select>
+                        <div class="error-message" id="errorGenero"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" name="password" required placeholder="Contraseña segura">
+                        <div class="error-message" id="errorPassword"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Contraseña:</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirma tu contraseña">
+                        <div class="error-message" id="errorConfirmPassword"></div>
+                    </div>
+
+                    <button type="submit" class="registro-button">✓ Crear Cuenta</button>
+                </form>
+
+                <div class="login-link">
+                    <p>¿Ya tienes cuenta?</p>
+                    <a href="login.html">Inicia sesión aquí</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Verificar si el usuario ya está logueado
+        function verificarSesionExistente() {
+            fetch('api/verificar_sesion.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logueado) {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        window.addEventListener('load', verificarSesionExistente);
+
+        async function registrarUsuario(event) {
+            event.preventDefault();
+
+            // Obtener datos
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const edad = document.getElementById('edad').value;
+            const genero = document.getElementById('genero').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Limpiar mensajes
+            document.getElementById('mensajeError').style.display = 'none';
+            document.getElementById('mensajeExito').style.display = 'none';
+            limpiarErrores();
+
+            // Validaciones
+            if (!validarFormulario(nombre, email, telefono, edad, genero, password, confirmPassword)) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('nombre', nombre);
+                formData.append('email', email);
+                formData.append('telefono', telefono);
+                formData.append('edad', edad);
+                formData.append('genero', genero);
+                formData.append('password', password);
+
+                const response = await fetch('api/registro.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.exito) {
+                    document.getElementById('mensajeExito').textContent = '✓ ' + resultado.mensaje;
+                    document.getElementById('mensajeExito').style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    document.getElementById('mensajeError').textContent = '✗ ' + resultado.mensaje;
+                    document.getElementById('mensajeError').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('mensajeError').textContent = '✗ Error al procesar el registro';
+                document.getElementById('mensajeError').style.display = 'block';
+            }
+        }
+
+        function validarFormulario(nombre, email, telefono, edad, genero, password, confirmPassword) {
+            let valido = true;
+
+            if (nombre.length < 3) {
+                mostrarError('nombre', 'El nombre debe tener al menos 3 caracteres');
+                valido = false;
+            }
+
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!regexEmail.test(email)) {
+                mostrarError('email', 'Correo electrónico inválido');
+                valido = false;
+            }
+
+            const regexTelefono = /^[0-9+\s\-()]{7,}$/;
+            if (!regexTelefono.test(telefono)) {
+                mostrarError('telefono', 'Teléfono inválido');
+                valido = false;
+            }
+
+            if (edad < 13 || edad > 120) {
+                mostrarError('edad', 'La edad debe estar entre 13 y 120');
+                valido = false;
+            }
+
+            if (!genero) {
+                mostrarError('genero', 'Selecciona un género');
+                valido = false;
+            }
+
+            // Validar contraseña
+            const regexPassword = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+            if (!regexPassword.test(password)) {
+                mostrarError('password', 'La contraseña debe tener 6+ caracteres, 1 mayúscula y 1 número');
+                valido = false;
+            }
+
+            if (password !== confirmPassword) {
+                mostrarError('confirmPassword', 'Las contraseñas no coinciden');
+                valido = false;
+            }
+
+            return valido;
+        }
+
+        function mostrarError(campo, mensaje) {
+            const elemento = document.getElementById('error' + campo.charAt(0).toUpperCase() + campo.slice(1));
+            if (elemento) {
+                elemento.textContent = mensaje;
+            }
+        }
+
+        function limpiarErrores() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        // Validación en tiempo real
+        document.getElementById('nombre').addEventListener('blur', function() {
+            if (this.value.trim().length < 3) {
+                mostrarError('nombre', 'El nombre debe tener al menos 3 caracteres');
+            } else {
+                document.getElementById('errorNombre').textContent = '';
+            }
+        });
+
+        document.getElementById('email').addEventListener('blur', function() {
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value && !regexEmail.test(this.value)) {
+                mostrarError('email', 'Correo electrónico inválido');
+            } else {
+                document.getElementById('errorEmail').textContent = '';
+            }
+        });
+
+        document.getElementById('password').addEventListener('blur', function() {
+            const regexPassword = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+            if (this.value && !regexPassword.test(this.value)) {
+                mostrarError('password', 'Requiere 6+ caracteres, 1 mayúscula y 1 número');
+            } else {
+                document.getElementById('errorPassword').textContent = '';
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('blur', function() {
+            if (this.value !== document.getElementById('password').value) {
+                mostrarError('confirmPassword', 'Las contraseñas no coinciden');
+            } else {
+                document.getElementById('errorConfirmPassword').textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
