@@ -52,15 +52,25 @@ async function cargarUsuarioActual(id) {
 // Mostrar perfil del usuario
 async function mostrarPerfilUsuario(usuario) {
     const perfilDiv = document.getElementById('perfilUsuario');
-    let html = `<h3>${usuario.nombre} (${usuario.edad} años)</h3><p>Tus alergenos:</p><div class="alergias-usuario" id="alergenuarioContainer">`;
+    
+    // Mostrar fecha de nacimiento formateada
+    let fechaFormato = '-';
+    if (usuario.fecha_nacimiento) {
+        const fecha = new Date(usuario.fecha_nacimiento + 'T00:00:00');
+        fechaFormato = fecha.toLocaleDateString('es-ES');
+    }
+    
+    let html = `<h3>${usuario.nombre} - ${fechaFormato}</h3><p>Tus alergenos:</p><div class="alergias-usuario" id="alergenuarioContainer">`;
 
     try {
         const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuario.id}`);
-        const alergenos = await response.json();
+        const resultado = await response.json();
+        
+        const alergenos = resultado.alergenos || [];
 
         if (Array.isArray(alergenos) && alergenos.length > 0) {
             alergenos.forEach(alergeno => {
-                html += `<div class="chip-alergia ${alergeno.gravedad}">${alergeno.nombre}</div>`;
+                html += `<div class="chip-alergia">${alergeno.nombre}</div>`;
             });
         } else {
             html += '<p style="color: #90EE90;">✓ Sin alergenos registrados</p>';

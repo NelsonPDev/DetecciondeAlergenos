@@ -16,7 +16,7 @@ try {
         throw new Exception('Error de conexión: ' . $conn->connect_error);
     }
 
-    $stmt = $conn->prepare('SELECT id, nombre, email, telefono, edad, genero, fecha_registro FROM usuarios WHERE id = ?');
+    $stmt = $conn->prepare('SELECT id, nombre, email, telefono, fecha_nacimiento, genero, fecha_registro FROM usuarios WHERE id = ?');
     $stmt->bind_param('i', $usuario_id);
     $stmt->execute();
     $resultado = $stmt->get_result();

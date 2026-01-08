@@ -17,7 +17,7 @@ try {
         throw new Exception('Usuario inválido');
     }
 
-    $query = 'SELECT a.id, a.nombre, ua.gravedad 
+    $query = 'SELECT a.id, a.nombre
               FROM usuario_alergenos ua
               JOIN alergenos a ON ua.alergeno_id = a.id
               WHERE ua.usuario_id = ?

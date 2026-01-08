@@ -281,7 +281,7 @@
                         <span id="datNombre">-</span>
                     </div>
                     <div class="dato-personal">
-                        <label>Edad:</label>
+                        <label>Fecha de Nacimiento:</label>
                         <span id="datEdad">-</span>
                     </div>
                     <div class="dato-personal">
@@ -346,14 +346,21 @@
 
                 if (usuario) {
                     document.getElementById('datNombre').textContent = usuario.nombre;
-                    document.getElementById('datEdad').textContent = usuario.edad;
+                    
+                    // Mostrar fecha de nacimiento formateada
+                    let fechaFormato = '-';
+                    if (usuario.fecha_nacimiento) {
+                        const fecha = new Date(usuario.fecha_nacimiento + 'T00:00:00');
+                        fechaFormato = fecha.toLocaleDateString('es-ES');
+                    }
+                    document.getElementById('datEdad').textContent = fechaFormato;
                     document.getElementById('datTelefono').textContent = usuario.telefono;
                     document.getElementById('datGenero').textContent = usuario.genero;
                     document.getElementById('datEmail').textContent = usuario.email;
                     
-                    // Formatear fecha
-                    const fecha = new Date(usuario.fecha_registro);
-                    document.getElementById('datFecha').textContent = fecha.toLocaleDateString('es-ES');
+                    // Formatear fecha de registro
+                    const fechaReg = new Date(usuario.fecha_registro);
+                    document.getElementById('datFecha').textContent = fechaReg.toLocaleDateString('es-ES');
                 }
             } catch (error) {
                 console.error('Error al cargar datos:', error);
@@ -364,8 +371,9 @@
         async function cargarAlergenos(usuarioId) {
             try {
                 const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuarioId}`);
-                const alergenos = await response.json();
-
+                const resultado = await response.json();
+                
+                const alergenos = resultado.alergenos || [];
                 const contenedor = document.getElementById('contenedorAlergenos');
 
                 if (!Array.isArray(alergenos) || alergenos.length === 0) {
@@ -395,10 +403,8 @@
                     };
 
                     html += `
-                        <div class="tarjeta-alergeno activo" style="background: ${nivelColor[alergeno.gravedad] || '#f8f9fa'}; border-color: #667eea; color: #333;">
+                        <div class="tarjeta-alergeno activo" style="border-color: #667eea; color: #333;">
                             <div class="alergeno-nombre">${alergeno.nombre}</div>
-                            <div class="alergeno-gravedad">${nivelTexto[alergeno.gravedad]}</div>
-                            ${alergeno.observaciones ? `<div class="alergeno-gravedad" style="margin-top: 10px; font-size: 0.85em;">📝 ${alergeno.observaciones}</div>` : ''}
                         </div>
                     `;
                 });
