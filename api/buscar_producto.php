@@ -1,88 +1,107 @@
 <?php
-// api/buscar_producto.php
+// api/buscar_producto.php - Búsqueda de productos con Open Food Facts
+
+session_start();
+require_once '../config.php';
+require_once 'open_food_facts.php';
 
 header('Content-Type: application/json');
-session_start();
-
-require_once '../config.php';
-
-$respuesta = [
-    'exito' => false,
-    'producto' => null,
-    'alergenos' => []
-];
 
 try {
-    $codigo_barras = trim($_POST['codigo_barras'] ?? '');
-    $usuario_id = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : null;
-
+    // Validar entrada
+    if (!isset($_GET['codigo_barras']) && !isset($_POST['codigo_barras'])) {
+        throw new Exception('Código de barras requerido');
+    }
+    
+    $codigo_barras = trim($_GET['codigo_barras'] ?? $_POST['codigo_barras'] ?? '');
+    
     if (empty($codigo_barras)) {
         throw new Exception('Código de barras vacío');
     }
-
-    // Conectar a la base de datos
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     
-    if ($conn->connect_error) {
-        throw new Exception('Error de conexión: ' . $conn->connect_error);
+    // Buscar en Open Food Facts
+    $api = new OpenFoodFactsAPI();
+    $producto = $api->buscarProductoPorCodigo($codigo_barras);
+    
+    if (!$producto) {
+        echo json_encode([
+            'exito' => false,
+            'mensaje' => 'Producto no encontrado en Open Food Facts'
+        ]);
+        exit;
     }
-
-    // Buscar producto
-    $stmt = $conn->prepare('SELECT id, codigo_barras, nombre, marca, categoria, descripcion FROM productos WHERE codigo_barras = ?');
-    $stmt->bind_param('s', $codigo_barras);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-
-    if ($resultado->num_rows > 0) {
-        $producto = $resultado->fetch_assoc();
-        $respuesta['producto'] = $producto;
-
-        // Obtener alergenos del producto
-        $stmt2 = $conn->prepare('
-            SELECT a.id, a.nombre, pa.tipo_presencia, pa.trazas
-            FROM producto_alergenos pa
-            JOIN alergenos a ON pa.alergeno_id = a.id
-            WHERE pa.producto_id = ?
-            ORDER BY a.nombre
-        ');
+    
+    // Si el usuario está autenticado, guardar en historial
+    if (isset($_SESSION['usuario_id'])) {
+        $usuario_id = $_SESSION['usuario_id'];
         
-        $stmt2->bind_param('i', $producto['id']);
-        $stmt2->execute();
-        $alergenos_resultado = $stmt2->get_result();
-
-        while ($alergeno = $alergenos_resultado->fetch_assoc()) {
-            $respuesta['alergenos'][] = $alergeno;
+        $stmt = $conexion->prepare("
+            INSERT INTO historial_escaneos 
+            (usuario_id, codigo_barras, nombre_producto, marca, imagen_url, alergenos_detectados) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        
+        if (!$stmt) {
+            throw new Exception('Error en prepared statement: ' . $conexion->error);
         }
-
-        $respuesta['exito'] = true;
-        $stmt2->close();
-
-        // Registrar escaneo si hay usuario logueado
-        if ($usuario_id) {
-            $tiene_alergenos = count($respuesta['alergenos']) > 0 ? 1 : 0;
-
-            $insert_stmt = $conn->prepare('
-                INSERT INTO historial_escaneos (usuario_id, producto_id, codigo_barras, fecha_escaneo, tiene_alergenos)
-                VALUES (?, ?, ?, NOW(), ?)
-            ');
-            
-            $insert_stmt->bind_param('iisi', $usuario_id, $producto['id'], $codigo_barras, $tiene_alergenos);
-            $insert_stmt->execute();
-            $insert_stmt->close();
-        }
-
-    } else {
-        $respuesta['exito'] = true;
-        $respuesta['producto'] = null;
+        
+        $alergenos_json = json_encode($producto['alergenos']);
+        $stmt->bind_param(
+            "isssss", 
+            $usuario_id, 
+            $codigo_barras,
+            $producto['nombre'],
+            $producto['marca'],
+            $producto['imagen_url'],
+            $alergenos_json
+        );
+        
+        $stmt->execute();
+        $stmt->close();
     }
-
-    $stmt->close();
-    $conn->close();
-
+    
+    // Obtener alérgenos del usuario si está autenticado
+    $alergenos_usuario = [];
+    if (isset($_SESSION['usuario_id'])) {
+        $result = $conexion->query("
+            SELECT nombre_alergeno FROM usuario_alergenos
+            WHERE usuario_id = " . $_SESSION['usuario_id']
+        );
+        
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $alergenos_usuario[] = $row['nombre_alergeno'];
+            }
+        }
+    }
+    
+    // Comparar alérgenos detectados con los del usuario
+    $alergenos_coincidentes = array_intersect(
+        $producto['alergenos'],
+        $alergenos_usuario
+    );
+    
+    echo json_encode([
+        'exito' => true,
+        'producto' => [
+            'codigo_barras' => $producto['codigo_barras'],
+            'nombre' => $producto['nombre'],
+            'marca' => $producto['marca'],
+            'imagen' => $producto['imagen_url'],
+            'url' => $producto['url']
+        ],
+        'alergenos_producto' => $producto['alergenos'],
+        'alergenos_usuario' => $alergenos_usuario,
+        'alergenos_coincidentes' => array_values($alergenos_coincidentes),
+        'tiene_riesgo' => !empty($alergenos_coincidentes),
+        'ingredientes' => $producto['ingredientes']
+    ]);
+    
 } catch (Exception $e) {
-    $respuesta['exito'] = false;
-    $respuesta['mensaje'] = $e->getMessage();
+    http_response_code(400);
+    echo json_encode([
+        'exito' => false,
+        'error' => $e->getMessage()
+    ]);
 }
-
-echo json_encode($respuesta);
 ?>

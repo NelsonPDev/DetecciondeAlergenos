@@ -67,7 +67,8 @@ try {
         'exito' => true,
         'mensaje' => 'Sesión iniciada correctamente',
         'usuario_id' => $usuario['id'],
-        'usuario_nombre' => $usuario['nombre']
+        'usuario_nombre' => $usuario['nombre'],
+        'redirect' => '../dashboard.html'
     ]);
 
     $conn->close();

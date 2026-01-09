@@ -1,39 +1,62 @@
 <?php
+// api/obtener_alergenos_comunes.php - Lista de alérgenos comunes
+
 header('Content-Type: application/json');
-require_once '../config.php';
 
-try {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-    
-    if ($conn->connect_error) {
-        throw new Exception('Error de conexión: ' . $conn->connect_error);
-    }
+$alergenos_comunes = [
+    [
+        'nombre' => 'Gluten',
+        'descripcion' => 'Proteína presente en trigo, cebada, centeno'
+    ],
+    [
+        'nombre' => 'Lactosa',
+        'descripcion' => 'Azúcar presente en productos lácteos'
+    ],
+    [
+        'nombre' => 'Frutos Secos',
+        'descripcion' => 'Incluye almendras, nueces, pistachos, avellanas'
+    ],
+    [
+        'nombre' => 'Maní/Cacahuate',
+        'descripcion' => 'Legumbre con alto riesgo alergénico'
+    ],
+    [
+        'nombre' => 'Huevo',
+        'descripcion' => 'Alérgeno común en productos de panadería'
+    ],
+    [
+        'nombre' => 'Pescado',
+        'descripcion' => 'Alérgeno presente en productos del mar'
+    ],
+    [
+        'nombre' => 'Crustáceos',
+        'descripcion' => 'Camarones, cangrejos, langostas'
+    ],
+    [
+        'nombre' => 'Soja',
+        'descripcion' => 'Alérgeno presente en muchos productos procesados'
+    ],
+    [
+        'nombre' => 'Mostaza',
+        'descripcion' => 'Condimento alergénico'
+    ],
+    [
+        'nombre' => 'Ajonjolí/Sésamo',
+        'descripcion' => 'Semilla alergénica'
+    ],
+    [
+        'nombre' => 'Moluscos',
+        'descripcion' => 'Incluye almejas, mejillones, ostras'
+    ],
+    [
+        'nombre' => 'Conservantes/Sulfitos',
+        'descripcion' => 'Aditivos alimentarios'
+    ]
+];
 
-    // Obtener todos los alergenos disponibles
-    $sql = 'SELECT id, nombre, descripcion, color, icono FROM alergenos ORDER BY nombre ASC';
-    $resultado = $conn->query($sql);
-
-    if (!$resultado) {
-        throw new Exception('Error en la consulta: ' . $conn->error);
-    }
-
-    $alergenos = [];
-    while ($fila = $resultado->fetch_assoc()) {
-        $alergenos[] = $fila;
-    }
-
-    echo json_encode([
-        'exito' => true,
-        'alergenos' => $alergenos
-    ]);
-
-    $conn->close();
-
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'exito' => false,
-        'mensaje' => 'Error al obtener alergenos: ' . $e->getMessage()
-    ]);
-}
+echo json_encode([
+    'exito' => true,
+    'alergenos' => $alergenos_comunes,
+    'total' => count($alergenos_comunes)
+]);
 ?>

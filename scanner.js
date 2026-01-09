@@ -37,12 +37,12 @@ async function verificarSesion() {
 // Cargar datos del usuario actual
 async function cargarUsuarioActual(id) {
     try {
-        const response = await fetch(`api/obtener_usuario.php?id=${id}`);
-        const usuario = await response.json();
+        const response = await fetch('api/obtener_usuario.php');
+        const data = await response.json();
 
-        if (usuario) {
-            usuarioActual = usuario;
-            await mostrarPerfilUsuario(usuario);
+        if (data.exito && data.usuario) {
+            usuarioActual = data.usuario;
+            await mostrarPerfilUsuario(data.usuario);
         }
     } catch (error) {
         console.error('Error al cargar usuario:', error);
@@ -63,14 +63,14 @@ async function mostrarPerfilUsuario(usuario) {
     let html = `<h3>${usuario.nombre} - ${fechaFormato}</h3><p>Tus alergenos:</p><div class="alergias-usuario" id="alergenuarioContainer">`;
 
     try {
-        const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuario.id}`);
+        const response = await fetch('api/obtener_alergenos_usuario.php');
         const resultado = await response.json();
         
         const alergenos = resultado.alergenos || [];
 
         if (Array.isArray(alergenos) && alergenos.length > 0) {
             alergenos.forEach(alergeno => {
-                html += `<div class="chip-alergia">${alergeno.nombre}</div>`;
+                html += `<div class="chip-alergia">${alergeno}</div>`;
             });
         } else {
             html += '<p style="color: #90EE90;">✓ Sin alergenos registrados</p>';
@@ -150,24 +150,23 @@ async function mostrarResultado(data, codigo) {
             <h3>${producto.nombre}</h3>
             <div class="info-producto">
                 <p><strong>Marca:</strong> ${producto.marca || 'N/A'}</p>
-                <p><strong>Categoría:</strong> ${producto.categoria || 'N/A'}</p>
                 <p><strong>Código de Barras:</strong> ${producto.codigo_barras}</p>
             </div>
         `;
 
         // Obtener alergenos del usuario actual
         const alergasUsuario = await obtenerAlergosUsuario(usuarioId);
+        const nombresAlergenos = alergasUsuario.map(a => a.nombre || a);
 
-        if (data.alergenos && data.alergenos.length > 0) {
+        if (data.alergenos_detectados && data.alergenos_detectados.length > 0) {
             html += '<h4 style="color: #dc3545;">⚠️ Alergenos Detectados:</h4>';
             
-            data.alergenos.forEach(alergeno => {
-                const tieneAlergeno = alergasUsuario.some(a => a.id === alergeno.id);
+            data.alergenos_detectados.forEach(alergeno => {
+                const tieneAlergeno = nombresAlergenos.includes(alergeno);
 
                 html += `
                     <div class="alergeno-encontrado">
-                        <strong>${alergeno.nombre}</strong>
-                        <p>${alergeno.tipo_presencia === 'Trazas' ? '⚠️ Trazas' : '🚫 Contiene'}</p>
+                        <strong>${alergeno}</strong>
                         ${tieneAlergeno ? '<p style="color: red; font-weight: bold;">⛔ ¡PELIGROSO PARA TI!</p>' : ''}
                     </div>
                 `;
@@ -175,11 +174,19 @@ async function mostrarResultado(data, codigo) {
         } else {
             html += '<div class="alergeno-seguro"><strong>✓ Este producto no contiene alergenos registrados</strong></div>';
         }
+
+        // Mostrar coincidencias con alergenos del usuario
+        if (data.alergenos_coincidentes && data.alergenos_coincidentes.length > 0) {
+            html += '<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 4px; margin-top: 15px;"><strong>⚠️ Alergenos que tienes:</strong><ul>';
+            data.alergenos_coincidentes.forEach(alergeno => {
+                html += `<li>${alergeno}</li>`;
+            });
+            html += '</ul></div>';
+        }
     } else {
         html = `
             <p style="color: #999;">Producto no encontrado en la base de datos</p>
             <p style="color: #666;">Código buscado: <strong>${codigo}</strong></p>
-            <p>Puedes sugerir agregar este producto a la base de datos</p>
         `;
     }
 
@@ -189,8 +196,14 @@ async function mostrarResultado(data, codigo) {
 // Obtener alergenos del usuario
 async function obtenerAlergosUsuario(usuarioId) {
     try {
-        const response = await fetch(`api/obtener_alergenos_usuario.php?usuario_id=${usuarioId}`);
-        return await response.json();
+        const response = await fetch('api/obtener_alergenos_usuario.php');
+        const data = await response.json();
+        
+        if (data.exito && data.alergenos) {
+            // Convertir array de strings a array de objetos para compatibilidad
+            return data.alergenos.map(nombre => ({nombre}));
+        }
+        return [];
     } catch (error) {
         console.error('Error:', error);
         return [];

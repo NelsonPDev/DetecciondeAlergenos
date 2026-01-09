@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Detección de Alérgenos</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .perfil-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .seccion {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .seccion:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .alergenos-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .alergia-tag {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
+
+        .alergia-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-left: 10px;
+            padding: 0;
+        }
+
+        .alergia-tag button:hover {
+            color: #ffcccc;
+        }
+
+        .selector-alergenos {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .alergeno-opcion {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .alergeno-opcion:hover {
+            border-color: #ff6b6b;
+            background: #ffe0e0;
+        }
+
+        .alergeno-opcion.seleccionado {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+        }
+
+        .formulario-grupo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .formulario-grupo input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff5252;
+        }
+
+        .btn-secondary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #45a049;
+        }
+
+        .btn-salir {
+            background: #888;
+            color: white;
+        }
+
+        .btn-salir:hover {
+            background: #666;
+        }
+
+        .mensaje {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .mensaje.exito {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .mensaje.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .vacio {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .info-usuario {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .info-usuario p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .info-usuario .nombre {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="perfil-container">
+        <h1>Mi Perfil</h1>
+        
+        <div id="mensaje" class="mensaje"></div>
+
+        <!-- Información del usuario -->
+        <div class="seccion">
+            <div class="info-usuario">
+                <p class="nombre" id="nombre-usuario">Cargando...</p>
+                <p>Email: <span id="email-usuario">Cargando...</span></p>
+            </div>
+        </div>
+
+        <!-- Alérgenos del usuario -->
+        <div class="seccion">
+            <h2>Mis Alérgenos</h2>
+            <div id="alergenos-usuario" class="alergenos-lista">
+                <div class="vacio">Aún no tienes alérgenos registrados</div>
+            </div>
+        </div>
+
+        <!-- Agregar alérgenos desde lista común -->
+        <div class="seccion">
+            <h2>Agregar Alérgenos Comunes</h2>
+            <p style="color: #666; font-size: 0.9em;">Haz clic en los alérgenos que tienes para agregarlos a tu perfil:</p>
+            <div id="alergenos-comunes" class="selector-alergenos">
+                <div class="vacio">Cargando lista de alérgenos...</div>
+            </div>
+        </div>
+
+        <!-- Agregar alérgeno personalizado -->
+        <div class="seccion">
+            <h2>Agregar Alérgeno Personalizado</h2>
+            <div class="formulario-grupo">
+                <input 
+                    type="text" 
+                    id="input-alergeno" 
+                    placeholder="Ingresa el nombre del alérgeno"
+                    onkeypress="if(event.key === 'Enter') agregarAlergeno()"
+                >
+                <button class="btn btn-primary" onclick="agregarAlergeno()">Agregar</button>
+            </div>
+        </div>
+
+        <!-- Botón salir -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-salir" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script>
+        // Cargar información del usuario
+        function cargarUsuario() {
+            fetch('api/obtener_usuario.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito) {
+                        document.getElementById('nombre-usuario').textContent = data.usuario.nombre;
+                        document.getElementById('email-usuario').textContent = data.usuario.email;
+                    } else {
+                        mostrarMensaje('Error al cargar usuario: ' + data.mensaje, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensaje('Error de conexión', 'error');
+                });
+        }
+
+        // Cargar alérgenos del usuario
+        function cargarAlergenosUsuario() {
+            fetch('api/obtener_alergenos_usuario.php')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('alergenos-usuario');
+                    
+                    if (data.exito && data.alergenos.length > 0) {
+                        container.innerHTML = data.alergenos.map(alergeno => `
+                            <div class="alergia-tag">
+                                <span>${alergeno}</span>
+                                <button onclick="eliminarAlergeno('${alergeno}')">×</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        container.innerHTML = '<div class="vacio">Aún no tienes alérgenos registrados</div>';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Cargar alérgenos comunes
+        function cargarAlergenosComunes() {
+            fetch('api/obtener_alergenos_comunes.php')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('alergenos-comunes');
+                    
+                    if (data.exito && data.alergenos.length > 0) {
+                        container.innerHTML = data.alergenos.map(alergeno => `
+                            <div 
+                                class="alergeno-opcion" 
+                                onclick="agregarAlergeno('${alergeno.nombre}', this)"
+                                title="${alergeno.descripcion}"
+                            >
+                                ${alergeno.nombre}
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Agregar alérgeno
+        function agregarAlergeno(nombre = null, element = null) {
+            const nombreAlergeno = nombre || document.getElementById('input-alergeno').value.trim();
+
+            if (!nombreAlergeno) {
+                mostrarMensaje('Por favor ingresa el nombre del alérgeno', 'error');
+                return;
+            }
+
+            fetch('api/agregar_alergeno.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nombre_alergeno: nombreAlergeno })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exito) {
+                    mostrarMensaje('✓ Alérgeno agregado correctamente', 'exito');
+                    document.getElementById('input-alergeno').value = '';
+                    
+                    // Marcar como seleccionado si viene de lista común
+                    if (element) {
+                        element.classList.add('seleccionado');
+                    }
+                    
+                    cargarAlergenosUsuario();
+                } else {
+                    mostrarMensaje('Error: ' + data.mensaje, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error de conexión', 'error');
+            });
+        }
+
+        // Eliminar alérgeno
+        function eliminarAlergeno(nombre) {
+            if (!confirm('¿Eliminar ' + nombre + '?')) {
+                return;
+            }
+
+            fetch('api/eliminar_alergeno.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nombre_alergeno: nombre })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exito) {
+                    mostrarMensaje('✓ Alérgeno eliminado', 'exito');
+                    
+                    // Desmarcar de lista común
+                    const opciones = document.querySelectorAll('.alergeno-opcion.seleccionado');
+                    opciones.forEach(opcion => {
+                        if (opcion.textContent.includes(nombre)) {
+                            opcion.classList.remove('seleccionado');
+                        }
+                    });
+                    
+                    cargarAlergenosUsuario();
+                } else {
+                    mostrarMensaje('Error: ' + data.mensaje, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error de conexión', 'error');
+            });
+        }
+
+        // Mostrar mensaje
+        function mostrarMensaje(texto, tipo) {
+            const elemento = document.getElementById('mensaje');
+            elemento.textContent = texto;
+            elemento.className = 'mensaje ' + tipo;
+            
+            setTimeout(() => {
+                elemento.className = 'mensaje';
+            }, 3000);
+        }
+
+        // Cerrar sesión
+        function cerrarSesion() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                fetch('api/logout.php')
+                    .then(() => {
+                        window.location.href = 'login.html';
+                    });
+            }
+        }
+
+        // Marcar alérgenos ya seleccionados
+        function marcarSeleccionados() {
+            fetch('api/obtener_alergenos_usuario.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito) {
+                        const userAlergenos = data.alergenos;
+                        const opciones = document.querySelectorAll('.alergeno-opcion');
+                        
+                        opciones.forEach(opcion => {
+                            if (userAlergenos.includes(opcion.textContent)) {
+                                opcion.classList.add('seleccionado');
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            cargarUsuario();
+            cargarAlergenosUsuario();
+            cargarAlergenosComunes();
+            
+            // Marcar seleccionados después de cargar comunes
+            setTimeout(marcarSeleccionados, 500);
+        });
+    </script>
+</body>
+</html>

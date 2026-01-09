@@ -231,7 +231,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.logueado) {
-                        window.location.href = 'index.html';
+                        window.location.href = 'dashboard.html';
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -277,7 +277,7 @@
                     document.getElementById('mensajeExito').style.display = 'block';
 
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = resultado.redirect || 'dashboard.html';
                     }, 1000);
                 } else {
                     document.getElementById('mensajeError').textContent = '✗ ' + resultado.mensaje;

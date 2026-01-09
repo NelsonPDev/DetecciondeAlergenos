@@ -98,61 +98,30 @@ try {
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
     // Insertar nuevo usuario
-    $stmt = $conn->prepare('INSERT INTO usuarios (nombre, email, telefono, fecha_nacimiento, genero, password, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+    $stmt = $conn->prepare('INSERT INTO usuarios (nombre, email, password, fecha_nacimiento, fecha_registro) VALUES (?, ?, ?, ?, NOW())');
     
     if (!$stmt) {
         throw new Exception('Error en la consulta preparada: ' . $conn->error);
     }
 
-    $stmt->bind_param('ssssss', $nombre, $email, $telefono, $fecha_nacimiento, $genero, $password_hash);
+    $stmt->bind_param('ssss', $nombre, $email, $password_hash, $fecha_nacimiento);
     
     if ($stmt->execute()) {
         $usuario_id = $stmt->insert_id;
         
-        // Procesar alergenos seleccionados (por ID)
-        $alergenos_array = json_decode($alergenos, true);
-        
-        if (is_array($alergenos_array) && !empty($alergenos_array)) {
-            $stmt_alergeno = $conn->prepare('INSERT INTO usuario_alergenos (usuario_id, alergeno_id) VALUES (?, ?)');
-            
-            foreach ($alergenos_array as $alergeno_id) {
-                $alergeno_id = intval($alergeno_id);
-                if ($alergeno_id > 0) {
-                    $stmt_alergeno->bind_param('ii', $usuario_id, $alergeno_id);
-                    $stmt_alergeno->execute();
-                }
-            }
-            $stmt_alergeno->close();
-        }
-        
-        // Procesar alergenos personalizados
-        if (!empty($alergenos_personalizados)) {
-            // Primero, crear los alergenos personalizados en la tabla alergenos
-            $alergenos_custom = array_map('trim', explode(',', $alergenos_personalizados));
-            $stmt_crear = $conn->prepare('INSERT INTO alergenos (nombre) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)');
-            
-            foreach ($alergenos_custom as $alergeno_nombre) {
-                if (!empty($alergeno_nombre)) {
-                    $stmt_crear->bind_param('s', $alergeno_nombre);
-                    if ($stmt_crear->execute()) {
-                        $alergeno_id = $stmt_crear->insert_id;
-                        if ($alergeno_id > 0) {
-                            // Insertar en usuario_alergenos
-                            $stmt_usuario = $conn->prepare('INSERT INTO usuario_alergenos (usuario_id, alergeno_id) VALUES (?, ?)');
-                            $stmt_usuario->bind_param('ii', $usuario_id, $alergeno_id);
-                            $stmt_usuario->execute();
-                            $stmt_usuario->close();
-                        }
-                    }
-                }
-            }
-            $stmt_crear->close();
-        }
+        // Los alérgenos se agregarán después en el perfil del usuario
+
+        // Iniciar sesión automáticamente
+        session_start();
+        $_SESSION['usuario_id'] = $usuario_id;
+        $_SESSION['usuario_nombre'] = $nombre;
+        $_SESSION['usuario_email'] = $email;
 
         echo json_encode([
             'exito' => true,
-            'mensaje' => 'Cuenta creada exitosamente. Redirigiendo a login...',
-            'usuario_id' => $usuario_id
+            'mensaje' => 'Cuenta creada exitosamente. ¡Bienvenido!',
+            'usuario_id' => $usuario_id,
+            'redirect' => '../dashboard.html'
         ]);
     } else {
         throw new Exception('Error al insertar: ' . $stmt->error);
