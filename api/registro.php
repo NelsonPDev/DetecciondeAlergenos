@@ -109,7 +109,19 @@ try {
     if ($stmt->execute()) {
         $usuario_id = $stmt->insert_id;
         
-        // Los alérgenos se agregarán después en el perfil del usuario
+        // Procesar alérgenos si se enviaron
+        $alergenos_seleccionados = json_decode($_POST['alergenos'] ?? '[]', true);
+
+        if (!empty($alergenos_seleccionados) && is_array($alergenos_seleccionados)) {
+            $stmt_alergeno = $conn->prepare("INSERT INTO usuario_alergenos (usuario_id, nombre_alergeno) VALUES (?, ?)");
+            if ($stmt_alergeno) {
+                foreach ($alergenos_seleccionados as $alergeno_nombre) {
+                    $stmt_alergeno->bind_param("is", $usuario_id, $alergeno_nombre);
+                    $stmt_alergeno->execute();
+                }
+                $stmt_alergeno->close();
+            }
+        }
 
         // Iniciar sesión automáticamente
         session_start();
