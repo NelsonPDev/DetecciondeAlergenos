@@ -5,12 +5,9 @@ require_once '../config.php';
 // Obtener datos POST
 $nombre = $_POST['nombre'] ?? '';
 $email = $_POST['email'] ?? '';
-$telefono = $_POST['telefono'] ?? '';
 $fecha_nacimiento = $_POST['fecha_nacimiento'] ?? '';
-$genero = $_POST['genero'] ?? '';
 $password = $_POST['password'] ?? '';
 $alergenos = $_POST['alergenos'] ?? '[]';
-$alergenos_personalizados = $_POST['alergenos_personalizados'] ?? '';
 
 // Validaciones básicas
 if (empty($nombre) || empty($email) || empty($password) || empty($fecha_nacimiento)) {
