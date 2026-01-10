@@ -628,3 +628,47 @@ footer {
     border-radius: 8px;
     border: 1px solid #e0e0e0;
 }
+
+/* Estilos para Alérgenos como Tags */
+#alergenos-comunes-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background-color: transparent; /* Quitar el fondo gris */
+    border: none; /* Quitar el borde */
+    padding: 0; /* Quitar padding */
+    max-height: none; /* Permitir que crezca si es necesario */
+}
+
+.alergeno-checkbox {
+    display: inline-block;
+}
+
+.alergeno-checkbox input[type="checkbox"] {
+    display: none; /* Ocultar el checkbox real */
+}
+
+.alergeno-checkbox label {
+    display: inline-block;
+    padding: 10px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px; /* Bordes más redondeados para forma de píldora */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #555;
+}
+
+.alergeno-checkbox label:hover {
+    border-color: #c0c0c0;
+    background-color: #f5f5f5;
+}
+
+/* Estilo para cuando el alérgeno está seleccionado */
+.alergeno-checkbox input[type="checkbox"]:checked + label {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+}
