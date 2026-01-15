@@ -143,7 +143,7 @@ async function buscarProducto() {
 }
 
 // Mostrar resultado de la búsqueda
-async function mostrarResultado(data, codigo) {
+function mostrarResultado(data, codigo) {
     const resultadoDiv = document.getElementById('resultadoContainer');
     let html = '';
 
@@ -157,38 +157,44 @@ async function mostrarResultado(data, codigo) {
             </div>
         `;
 
-        // Obtener alergenos del usuario actual
-        const alergasUsuario = await obtenerAlergosUsuario(usuarioId);
-        const nombresAlergenos = alergasUsuario.map(a => a.nombre || a);
-
-        if (data.alergenos_detectados && data.alergenos_detectados.length > 0) {
-            html += '<h4 style="color: #dc3545;">⚠️ Alergenos Detectados:</h4>';
-            
-            data.alergenos_detectados.forEach(alergeno => {
-                const tieneAlergeno = nombresAlergenos.includes(alergeno);
-
-                html += `
-                    <div class="alergeno-encontrado">
-                        <strong>${alergeno}</strong>
-                        ${tieneAlergeno ? '<p style="color: red; font-weight: bold;">⛔ ¡PELIGROSO PARA TI!</p>' : ''}
-                    </div>
-                `;
-            });
-        } else {
-            html += '<div class="alergeno-seguro"><strong>✓ Este producto no contiene alergenos registrados</strong></div>';
+        // Mostrar el mensaje de advertencia principal si existe
+        if (data.mensaje_advertencia) {
+            html += `
+                <div style="background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; padding: 20px; border-radius: 8px; margin-top: 15px; font-size: 1.1em; text-align: center;">
+                    <strong>${data.mensaje_advertencia}</strong>
+                </div>
+            `;
         }
 
-        // Mostrar coincidencias con alergenos del usuario
-        if (data.alergenos_coincidentes && data.alergenos_coincidentes.length > 0) {
-            html += '<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 4px; margin-top: 15px;"><strong>⚠️ Alergenos que tienes:</strong><ul>';
-            data.alergenos_coincidentes.forEach(alergeno => {
+        // Listar todos los alérgenos detectados en el producto (para información)
+        if (data.alergenos_detectados && data.alergenos_detectados.length > 0) {
+            html += '<h4 style="margin-top: 20px;">Alérgenos declarados en el producto:</h4>';
+            html += '<ul>';
+            data.alergenos_detectados.forEach(alergeno => {
                 html += `<li>${alergeno}</li>`;
             });
-            html += '</ul></div>';
+            html += '</ul>';
+        } else {
+            html += `
+                <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                    <strong>✓ Este producto no declara alérgenos comunes.</strong>
+                </div>
+            `;
         }
+        
+        // Mostrar lista de ingredientes
+        if (data.ingredientes) {
+            html += `
+                <div style="margin-top: 20px;">
+                    <h4>Ingredientes:</h4>
+                    <p style="font-size: 0.9em; color: #666;">${data.ingredientes}</p>
+                </div>
+            `;
+        }
+
     } else {
         html = `
-            <p style="color: #999;">Producto no encontrado en la base de datos</p>
+            <p style="color: #999;">Producto no encontrado en la base de datos de Open Food Facts.</p>
             <p style="color: #666;">Código buscado: <strong>${codigo}</strong></p>
         `;
     }

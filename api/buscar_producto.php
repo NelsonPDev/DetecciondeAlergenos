@@ -81,6 +81,12 @@ try {
         $alergenos_usuario
     );
     
+    // Preparar mensaje de advertencia si hay coincidencias
+    $mensaje_advertencia = '';
+    if (!empty($alergenos_coincidentes)) {
+        $mensaje_advertencia = '¡Atención! Este producto contiene ' . implode(', ', $alergenos_coincidentes) . ', que son alérgenos que has registrado. No debes consumirlo.';
+    }
+
     echo json_encode([
         'exito' => true,
         'producto' => [
@@ -90,11 +96,11 @@ try {
             'imagen' => $producto['imagen_url'],
             'url' => $producto['url']
         ],
-        'alergenos_producto' => $producto['alergenos'],
-        'alergenos_usuario' => $alergenos_usuario,
+        // Cambiado para coincidir con el frontend
+        'alergenos_detectados' => $producto['alergenos'], 
         'alergenos_coincidentes' => array_values($alergenos_coincidentes),
-        'tiene_riesgo' => !empty($alergenos_coincidentes),
-        'ingredientes' => $producto['ingredientes']
+        'ingredientes' => $producto['ingredientes'],
+        'mensaje_advertencia' => $mensaje_advertencia
     ]);
     
 } catch (Exception $e) {

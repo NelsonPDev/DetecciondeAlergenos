@@ -2,7 +2,7 @@
 // api/open_food_facts.php - Conexión con API de Open Food Facts
 
 class OpenFoodFactsAPI {
-    private $base_url = 'https://world.openfoodfacts.org/api/v0';
+    private $base_url = 'https://es.openfoodfacts.org/api/v0';
     private $timeout = 10;
     
     /**
@@ -19,15 +19,18 @@ class OpenFoodFactsAPI {
         
         $producto = $response['product'];
         
+        // Priorizar ingredientes en español, si no, usar el por defecto
+        $ingredientes = $producto['ingredients_text_es'] ?? $producto['ingredients_text'] ?? 'No se encontró la lista de ingredientes.';
+
         return [
             'codigo_barras' => $codigo_barras,
-            'nombre' => $producto['product_name'] ?? 'Producto sin nombre',
+            'nombre' => $producto['product_name_es'] ?? $producto['product_name'] ?? 'Producto sin nombre',
             'marca' => $producto['brands'] ?? 'Marca desconocida',
             'imagen_url' => $producto['image_url'] ?? null,
             'alergenos' => $this->extraerAlergenos($producto),
-            'ingredientes' => $producto['ingredients_text'] ?? null,
+            'ingredientes' => $ingredientes,
             'pais' => $producto['countries'] ?? null,
-            'url' => 'https://world.openfoodfacts.org/product/' . $codigo_barras
+            'url' => 'https://es.openfoodfacts.org/product/' . $codigo_barras
         ];
     }
     

@@ -4,11 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Detección de Alérgenos</title>
-    <link rel="stylesheet" href="../styles.css">
+--- d:\Documentos\DetecciondeAlergenos\styles.css
++++ d:\Documentos\DetecciondeAlergenos\styles.css
+@@ -628,3 +628,9 @@
+     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+     transform: translateY(-2px);
+ }
++
++.sidebar-link.active {
++    background-color: #f0f2f5;
++    color: #667eea;
++    font-weight: bold;
++}
+--- d:\Documentos\DetecciondeAlergenos\dashboard.html
++++ d:\Documentos\DetecciondeAlergenos\dashboard.html
+@@ -216,6 +216,7 @@
+                 <div id="emailUsuarioHeader" style="font-size: 0.85em; color: #666;">email@ejemplo.com</div>
+             </div>
+ 
++            <a href="dashboard.html" class="sidebar-link active">🏠 Inicio</a>
+             <a href="perfil.html" class="sidebar-link">👤 Mi Perfil</a>
+             <a href="historial.html" class="sidebar-link">📋 Historial</a>
+         </div>
+--- d:\Documentos\DetecciondeAlergenos\perfil.html
++++ d:\Documentos\DetecciondeAlergenos\perfil.html
+@@ -218,7 +218,7 @@
+             </div>
+             <a href="dashboard.html" class="sidebar-link">🏠 Inicio</a>
+-            <a href="perfil.html" class="sidebar-link" style="background-color: #f0f2f5; color: #667eea;">👤 Mi Perfil</a>
++            <a href="perfil.html" class="sidebar-link active">👤 Mi Perfil</a>
+             <a href="historial.html" class="sidebar-link">📋 Historial</a>
+         </div>
+         <div class="sidebar-footer">
+    <link rel="stylesheet" href="styles.css">
     <style>
+        /* Estilos del Sidebar y Header */
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        .sidebar {
+            height: 100%;
+            width: 280px;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: -280px;
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-content { padding: 20px; flex-grow: 1; overflow-y: auto; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #eee; background: #f9f9f9; }
+        .sidebar-link {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: #333; text-decoration: none; margin-bottom: 8px;
+            border-radius: 8px; transition: 0.2s; font-weight: 500;
+        }
+        .sidebar-link:hover { background-color: #f0f2f5; color: #667eea; transform: translateX(5px); }
+        .menu-btn {
+            background: none; border: none; color: white;
+            font-size: 1.8em; cursor: pointer; padding: 0; line-height: 1;
+        }
+        .overlay {
+            position: fixed; display: none; width: 100%; height: 100%;
+            top: 0; left: 0; background-color: rgba(0,0,0,0.5);
+            z-index: 1000; backdrop-filter: blur(2px);
+        }
+        .overlay.active { display: block; }
+        .close-btn {
+            background: none; border: none; color: white;
+            font-size: 2em; cursor: pointer; line-height: 1;
+        }
+        .btn-salir-menu {
+            width: 100%; padding: 12px; background-color: #fff;
+            color: #dc3545; border: 1px solid #dc3545; border-radius: 6px;
+            cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+        .btn-salir-menu:hover { background-color: #dc3545; color: white; }
+
+        .header-principal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-contenido {
+            max-width: 1200px; margin: 0 auto; padding: 0 20px;
+            display: flex; justify-content: flex-start; gap: 20px; align-items: center;
+        }
+        .logo { font-size: 1.5em; font-weight: bold; }
+
         .perfil-container {
             max-width: 600px;
-            margin: 20px auto;
+            margin: 30px auto;
             padding: 20px;
             background: white;
             border-radius: 8px;
@@ -188,8 +289,37 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div><h3 style="margin:0;">Menú</h3></div>
+            <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <div style="background: #f0f2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div id="nombreUsuarioMenu" style="font-weight: bold; color: #333;">Usuario</div>
+                <div id="emailUsuarioMenu" style="font-size: 0.85em; color: #666;">email@ejemplo.com</div>
+            </div>
+            <a href="dashboard.html" class="sidebar-link">🏠 Inicio</a>
+            <a href="perfil.html" class="sidebar-link" style="background-color: #f0f2f5; color: #667eea;">👤 Mi Perfil</a>
+            <a href="historial.html" class="sidebar-link">📋 Historial</a>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="cerrarSesion()" class="btn-salir-menu">🚪 Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header-principal">
+        <div class="header-contenido">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <div class="logo">🥘 Detección de Alérgenos</div>
+        </div>
+    </div>
+
     <div class="perfil-container">
-        <h1>Mi Perfil</h1>
+        <h1 style="text-align: center; color: #333;">Mi Perfil</h1>
         
         <div id="mensaje" class="mensaje"></div>
 
@@ -218,27 +348,22 @@
             </div>
         </div>
 
-        <!-- Agregar alérgeno personalizado -->
-        <div class="seccion">
-            <h2>Agregar Alérgeno Personalizado</h2>
-            <div class="formulario-grupo">
-                <input 
-                    type="text" 
-                    id="input-alergeno" 
-                    placeholder="Ingresa el nombre del alérgeno"
-                    onkeypress="if(event.key === 'Enter') agregarAlergeno()"
-                >
-                <button class="btn btn-primary" onclick="agregarAlergeno()">Agregar</button>
-            </div>
-        </div>
-
-        <!-- Botón salir -->
+        <!-- Botón Guardar -->
         <div style="text-align: center; margin-top: 30px;">
-            <button class="btn btn-salir" onclick="cerrarSesion()">Cerrar Sesión</button>
+            <button class="btn btn-primary" onclick="guardarCambios()" style="width: 100%; padding: 15px; font-size: 1.1em;">Guardar</button>
         </div>
     </div>
 
     <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function guardarCambios() {
+            window.location.href = 'dashboard.html';
+        }
+
         // Cargar información del usuario
         function cargarUsuario() {
             fetch('api/obtener_usuario.php')
@@ -247,6 +372,11 @@
                     if (data.exito) {
                         document.getElementById('nombre-usuario').textContent = data.usuario.nombre;
                         document.getElementById('email-usuario').textContent = data.usuario.email;
+                        // Actualizar menú
+                        if(document.getElementById('nombreUsuarioMenu')) {
+                            document.getElementById('nombreUsuarioMenu').textContent = data.usuario.nombre;
+                            document.getElementById('emailUsuarioMenu').textContent = data.usuario.email;
+                        }
                     } else {
                         mostrarMensaje('Error al cargar usuario: ' + data.mensaje, 'error');
                     }
@@ -302,7 +432,7 @@
 
         // Agregar alérgeno
         function agregarAlergeno(nombre = null, element = null) {
-            const nombreAlergeno = nombre || document.getElementById('input-alergeno').value.trim();
+            const nombreAlergeno = nombre;
 
             if (!nombreAlergeno) {
                 mostrarMensaje('Por favor ingresa el nombre del alérgeno', 'error');
@@ -320,7 +450,6 @@
             .then(data => {
                 if (data.exito) {
                     mostrarMensaje('✓ Alérgeno agregado correctamente', 'exito');
-                    document.getElementById('input-alergeno').value = '';
                     
                     // Marcar como seleccionado si viene de lista común
                     if (element) {
