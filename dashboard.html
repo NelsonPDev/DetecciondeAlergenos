@@ -5,9 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Detección de Alérgenos</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         body {
-            background: #f5f5f5;
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 280px;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: -280px;
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .sidebar-link:hover {
+            background-color: #f0f2f5;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8em;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        .overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active {
+            display: block;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .btn-salir-menu {
+            width: 100%;
+            padding: 12px;
+            background-color: #fff;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-salir-menu:hover {
+            background-color: #dc3545;
+            color: white;
         }
 
         .header-principal {
@@ -22,7 +122,8 @@
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 20px;
             align-items: center;
         }
 
@@ -31,275 +132,321 @@
             font-weight: bold;
         }
 
-        .usuario-menu {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .usuario-info-header {
-            text-align: right;
-        }
-
-        .usuario-info-header p {
-            margin: 0;
-            font-size: 0.9em;
-        }
-
-        .usuario-nombre {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .botones-menu {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-menu {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-menu:hover {
-            background: white;
-            color: #667eea;
-        }
-
-        .btn-salir {
-            background: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-salir:hover {
-            background: #c82333;
-            color: white;
-        }
-
         .dashboard-main {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 30px auto;
             padding: 0 20px;
         }
-
-        .tarjetas {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        
+        /* Estilos específicos del Escáner (Match image.png) */
+        .scanner-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .tarjeta {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: inherit;
+        .scanner-header h2 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .scanner-header p {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .camera-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto 30px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #reader {
+            width: 100%;
+            height: 100%;
+        }
+
+        .camera-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #2b2d42 0%, #1a1b26 100%);
             display: flex;
             flex-direction: column;
-            gap: 15px;
-        }
-
-        .tarjeta:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-
-        .tarjeta-icon {
-            font-size: 3em;
-            text-align: center;
-        }
-
-        .tarjeta-titulo {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .tarjeta-desc {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .tarjeta-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            z-index: 10;
         }
 
-        .tarjeta-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .resumen-alergenos {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .resumen-titulo {
+        .placeholder-title {
             font-size: 1.5em;
             font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .alergenos-rapido {
+        .placeholder-info {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+        }
+
+        .scan-frame {
+            width: 280px;
+            height: 180px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            position: relative;
+        }
+        
+        .scan-frame::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.5);
+        }
+
+        .scanner-controls {
             display: flex;
+            justify-content: center;
+            gap: 15px;
             flex-wrap: wrap;
+        }
+
+        .btn-scan {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-start {
+            background-color: #198754;
+            color: white;
+        }
+        .btn-start:hover { background-color: #157347; transform: translateY(-2px); }
+
+        .btn-stop {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-stop:hover { background-color: #bb2d3b; transform: translateY(-2px); }
+
+        .btn-manual {
+            background-color: white;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+        }
+        .btn-manual:hover { background-color: #f0f7ff; transform: translateY(-2px); }
+
+        .manual-input-section {
+            max-width: 600px;
+            margin: 20px auto 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .input-group {
+            display: flex;
             gap: 10px;
         }
 
-        .alergeno-badge {
-            background: #ff6b6b;
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        .btn-search {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
+            border: none;
+            padding: 0 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        .vacio-msg {
-            color: #999;
-            font-style: italic;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 768px) {
-            .header-contenido {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .tarjetas {
-                grid-template-columns: 1fr;
-            }
+            .scanner-controls { flex-direction: column; }
+            .btn-scan { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div>
+                <h3 style="margin:0;">Menú</h3>
+            </div>
+            <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <!-- User Info Widget -->
+            <div style="background: #f0f2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div id="nombreUsuarioHeader" style="font-weight: bold; color: #333;">Usuario</div>
+                <div id="emailUsuarioHeader" style="font-size: 0.85em; color: #666;">email@ejemplo.com</div>
+            </div>
+
+            <a href="perfil.html" class="sidebar-link">👤 Mi Perfil</a>
+            <a href="historial.html" class="sidebar-link">📋 Historial</a>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="cerrarSesion()" class="btn-salir-menu">🚪 Cerrar Sesión</button>
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="header-principal">
         <div class="header-contenido">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
             <div class="logo">🥘 Detección de Alérgenos</div>
-            <div class="usuario-menu">
-                <div class="usuario-info-header">
-                    <p class="usuario-nombre" id="nombre-usuario">Cargando...</p>
-                    <p id="email-usuario">Cargando...</p>
-                </div>
-                <div class="botones-menu">
-                    <a href="perfil.html" class="btn-menu">Mi Perfil</a>
-                    <button class="btn-menu btn-salir" onclick="cerrarSesion()">Salir</button>
-                </div>
-            </div>
         </div>
     </div>
 
     <!-- Contenido principal -->
     <div class="dashboard-main">
-        <!-- Resumen de alérgenos -->
-        <div class="resumen-alergenos">
-            <div class="resumen-titulo">Mis Alérgenos</div>
-            <div id="alergenos-resumen" class="alergenos-rapido">
-                <div class="vacio-msg">Cargando...</div>
-            </div>
-            <p style="margin-top: 15px; font-size: 0.9em;">
-                <a href="perfil.html" style="color: #667eea; text-decoration: none;">Editar mis alérgenos →</a>
-            </p>
-        </div>
-
-        <!-- Tarjetas de acciones -->
-        <div class="tarjetas">
-            <!-- Escanear Producto -->
-            <div class="tarjeta">
-                <div class="tarjeta-icon">📱</div>
-                <div class="tarjeta-titulo">Escanear Producto</div>
-                <div class="tarjeta-desc">Escanea el código de barras de un producto para verificar sus alérgenos</div>
-                <a href="scanner.html" class="tarjeta-btn">Ir al Escáner</a>
+        <div class="scanner-card">
+            <div class="scanner-header">
+                <h2>|||| Escanear Producto</h2>
+                <p>Enfoca el código de barras del producto dentro del área de escaneo</p>
             </div>
 
-            <!-- Mi Perfil -->
-            <div class="tarjeta">
-                <div class="tarjeta-icon">👤</div>
-                <div class="tarjeta-titulo">Mi Perfil</div>
-                <div class="tarjeta-desc">Gestiona tus alérgenos y información personal</div>
-                <a href="perfil.html" class="tarjeta-btn">Ir a Mi Perfil</a>
+            <div class="camera-wrapper">
+                <div id="reader"></div>
+                <div id="camera-placeholder" class="camera-placeholder">
+                    <div class="placeholder-title">Escáner de Código de Barras</div>
+                    <div class="placeholder-info">ℹ️ Coloca el código de barras dentro del marco verde</div>
+                    <div class="scan-frame"></div>
+                </div>
             </div>
 
-            <!-- Historial -->
-            <div class="tarjeta">
-                <div class="tarjeta-icon">📋</div>
-                <div class="tarjeta-titulo">Historial</div>
-                <div class="tarjeta-desc">Ve el historial de productos que has escaneado</div>
-                <a href="historial.html" class="tarjeta-btn">Ver Historial</a>
+            <div class="scanner-controls">
+                <button onclick="iniciarCamara()" class="btn-scan btn-start">▶ Iniciar Escáner</button>
+                <button onclick="detenerCamara()" class="btn-scan btn-stop">⏹ Detener Escáner</button>
+                <button onclick="toggleManualInput()" class="btn-scan btn-manual">⌨ Ingresar Manualmente</button>
             </div>
+
+            <div id="manual-input-section" class="manual-input-section" style="display: none;">
+                <div class="input-group">
+                    <input type="text" id="codigoBarras" placeholder="Ingresa el código de barras aquí...">
+                    <button onclick="buscarProducto()" class="btn-search">🔍 Buscar</button>
+                </div>
+            </div>
+
+            <div id="resultadoContainer" class="resultado-escaneo" style="display: none; margin-top: 25px;"></div>
+
+            <!-- Hidden elements for scanner.js compatibility -->
+            <div id="perfilUsuario" style="display: none;"></div>
+            <div id="tablaAlergenosBody" style="display: none;"></div>
+            <div id="historialContainer" style="display: none;"></div>
+            <div id="historialLista" style="display: none;"></div>
         </div>
     </div>
 
+    <script src="scanner.js"></script>
     <script>
-        // Cargar usuario
-        function cargarUsuario() {
-            fetch('api/obtener_usuario.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.exito) {
-                        document.getElementById('nombre-usuario').textContent = data.usuario.nombre;
-                        document.getElementById('email-usuario').textContent = data.usuario.email;
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+        // Sidebar Logic
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
         }
 
-        // Cargar alérgenos
-        function cargarAlergenos() {
-            fetch('api/obtener_alergenos_usuario.php')
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById('alergenos-resumen');
-                    
-                    if (data.exito && data.alergenos.length > 0) {
-                        container.innerHTML = data.alergenos.map(alergeno => 
-                            `<div class="alergeno-badge">${alergeno}</div>`
-                        ).join('');
-                    } else {
-                        container.innerHTML = '<div class="vacio-msg">No tienes alérgenos registrados</div>';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+        // Camera Logic using Html5Qrcode class for custom UI
+        let html5QrCode = null;
+
+        function iniciarCamara() {
+            // Ocultar placeholder
+            document.getElementById('camera-placeholder').style.display = 'none';
+            
+            if (html5QrCode) return; // Ya está iniciada
+
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.error("Error starting camera", err);
+                alert("Error al iniciar la cámara: " + err);
+                detenerCamara();
+            });
         }
 
-        // Cerrar sesión
-        function cerrarSesion() {
-            if (confirm('¿Deseas cerrar sesión?')) {
-                fetch('api/logout.php')
-                    .then(() => {
-                        window.location.href = 'login.html';
-                    });
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('codigoBarras').value = decodedText;
+            detenerCamara();
+            
+            // Mostrar sección manual para ver el código y buscar
+            document.getElementById('manual-input-section').style.display = 'block';
+            buscarProducto(); // Function from scanner.js
+        }
+
+        function onScanFailure(error) {
+            // console.warn(`Code scan error = ${error}`);
+        }
+
+        function detenerCamara() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                    document.getElementById('camera-placeholder').style.display = 'flex';
+                }).catch(err => console.error(err));
+            } else {
+                document.getElementById('camera-placeholder').style.display = 'flex';
             }
         }
 
-        // Inicializar
-        window.addEventListener('load', () => {
-            cargarUsuario();
-            cargarAlergenos();
-        });
+        function toggleManualInput() {
+            const section = document.getElementById('manual-input-section');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            if(section.style.display === 'block') document.getElementById('codigoBarras').focus();
+        }
     </script>
 </body>
 </html>

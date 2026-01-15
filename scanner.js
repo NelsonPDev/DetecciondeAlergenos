@@ -52,6 +52,7 @@ async function cargarUsuarioActual(id) {
 // Mostrar perfil del usuario
 async function mostrarPerfilUsuario(usuario) {
     const perfilDiv = document.getElementById('perfilUsuario');
+    if (!perfilDiv) return;
     
     // Mostrar fecha de nacimiento formateada
     let fechaFormato = '-';
@@ -91,6 +92,8 @@ async function cargarAlergenos() {
         const data = await response.json();
 
         const tbody = document.getElementById('tablaAlergenosBody');
+        if (!tbody) return;
+
         if (data.exito && data.alergenos) {
             data.alergenos.forEach(alergeno => {
                 const tr = document.createElement('tr');
@@ -232,6 +235,8 @@ function agregarHistorial(codigo, data) {
 function mostrarHistorial() {
     const historialDiv = document.getElementById('historialContainer');
     const historialLista = document.getElementById('historialLista');
+
+    if (!historialDiv || !historialLista) return;
 
     if (historialEscaneos.length > 0) {
         historialDiv.style.display = 'block';
