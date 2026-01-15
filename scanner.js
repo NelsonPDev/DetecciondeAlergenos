@@ -169,7 +169,7 @@ function mostrarResultado(data, codigo) {
         // Listar todos los alérgenos detectados en el producto (para información)
         if (data.alergenos_detectados && data.alergenos_detectados.length > 0) {
             html += '<h4 style="margin-top: 20px;">Alérgenos declarados en el producto:</h4>';
-            html += '<ul>';
+            html += '<ul style="list-style-type:none; padding-left: 0;">';
             data.alergenos_detectados.forEach(alergeno => {
                 html += `<li>${alergeno}</li>`;
             });
