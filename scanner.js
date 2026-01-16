@@ -114,7 +114,7 @@ async function buscarProducto() {
     const codigo = document.getElementById('codigoBarras').value.trim();
     
     if (!codigo) {
-        alert('Por favor ingresa un código de barras');
+        mostrarModalError('Por favor ingresa un código de barras');
         return;
     }
 
@@ -284,6 +284,23 @@ function restaurarHistorial() {
         } catch (e) {
             console.error('Error al restaurar historial:', e);
         }
+    }
+}
+
+// Funciones para el modal de error
+function mostrarModalError(mensaje) {
+    const modal = document.getElementById('errorModal');
+    const mensajeError = document.getElementById('modalErrorMessage');
+    if (modal && mensajeError) {
+        mensajeError.textContent = mensaje;
+        modal.style.display = 'flex'; // Usar flex para centrar
+    }
+}
+
+function cerrarModal() {
+    const modal = document.getElementById('errorModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
 
