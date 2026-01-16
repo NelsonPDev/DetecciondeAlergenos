@@ -294,19 +294,17 @@ function limpiarResultado() {
     document.getElementById('codigoBarras').focus();
 }
 
-// Cerrar sesión
+// Cerrar sesión (placeholder - will be overridden by dashboard.html)
 async function cerrarSesion() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        try {
-            const response = await fetch('api/logout.php');
-            const data = await response.json();
-            if (data.exito) {
-                window.location.href = 'login.html';
-            }
-        } catch (error) {
-            console.error('Error:', error);
+    try {
+        const response = await fetch('api/logout.php');
+        const data = await response.json();
+        if (data.exito) {
             window.location.href = 'login.html';
         }
+    } catch (error) {
+        console.error('Error:', error);
+        window.location.href = 'login.html';
     }
 }
 
