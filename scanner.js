@@ -2,7 +2,6 @@
 
 let usuarioActual = null;
 let usuarioId = null;
-let historialEscaneos = [];
 let isScannerActive = false;
 
 // Verificar sesión y cargar datos al iniciar
@@ -102,7 +101,6 @@ async function verificarSesion() {
         // Cargar datos del usuario
         await cargarUsuarioActual(usuarioId);
         await cargarAlergenos();
-        restaurarHistorial();
     } catch (error) {
         console.error('Error al verificar sesión:', error);
         window.location.href = 'login.html';
@@ -210,7 +208,6 @@ async function buscarProducto() {
 
         const data = await response.json();
         mostrarResultado(data, codigo);
-        agregarHistorial(codigo, data);
     } catch (error) {
         console.error('Error:', error);
         resultadoDiv.innerHTML = '<p style="color: red;">Error al buscar el producto</p>';
@@ -291,74 +288,6 @@ async function obtenerAlergosUsuario(usuarioId) {
     } catch (error) {
         console.error('Error:', error);
         return [];
-    }
-}
-
-// Agregar al historial
-function agregarHistorial(codigo, data) {
-    const item = {
-        codigo: codigo,
-        nombre: data.producto ? data.producto.nombre : 'Producto no encontrado',
-        fecha: new Date().toLocaleTimeString('es-ES'),
-        tieneAlergenos: data.alergenos && data.alergenos.length > 0
-    };
-
-    historialEscaneos.unshift(item);
-    if (historialEscaneos.length > 10) {
-        historialEscaneos.pop();
-    }
-
-    guardarHistorial();
-    mostrarHistorial();
-}
-
-// Mostrar historial
-function mostrarHistorial() {
-    const historialDiv = document.getElementById('historialContainer');
-    const historialLista = document.getElementById('historialLista');
-
-    if (!historialDiv || !historialLista) return;
-
-    if (historialEscaneos.length > 0) {
-        historialDiv.style.display = 'block';
-        historialLista.innerHTML = '';
-
-        historialEscaneos.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'item-historial';
-            div.innerHTML = `
-                <strong>${item.nombre}</strong>
-                <p style="margin: 5px 0; font-size: 0.9em;">
-                    Código: ${item.codigo}
-                    ${item.tieneAlergenos ? '⚠️ Tiene alergenos' : '✓ Sin alergenos'}
-                </p>
-                <small>${item.fecha}</small>
-            `;
-            div.style.cursor = 'pointer';
-            div.onclick = function() {
-                document.getElementById('codigoBarras').value = item.codigo;
-                buscarProducto();
-            };
-            historialLista.appendChild(div);
-        });
-    }
-}
-
-// Guardar historial en localStorage
-function guardarHistorial() {
-    localStorage.setItem('historialEscaneos', JSON.stringify(historialEscaneos));
-}
-
-// Restaurar historial desde localStorage
-function restaurarHistorial() {
-    const saved = localStorage.getItem('historialEscaneos');
-    if (saved) {
-        try {
-            historialEscaneos = JSON.parse(saved);
-            mostrarHistorial();
-        } catch (e) {
-            console.error('Error al restaurar historial:', e);
-        }
     }
 }
 

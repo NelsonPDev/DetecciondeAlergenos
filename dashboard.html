@@ -607,6 +607,24 @@
         function cerrarSesion() {
             showLogoutModal();
         }
+
+        // Verificación de sesión y carga de datos de usuario para el menú
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('api/verificar_sesion.php');
+                const data = await response.json();
+                if (!data.logueado) {
+                    window.location.href = 'index.html'; // Redirect to index.html if not logged in
+                } else {
+                    // Update user info in sidebar
+                    document.getElementById('nombreUsuarioHeader').textContent = data.usuario.nombre;
+                    document.getElementById('emailUsuarioHeader').textContent = data.usuario.email;
+                }
+            } catch (error) {
+                console.error('Error al verificar sesión:', error);
+                window.location.href = 'index.html'; // Redirect on error
+            }
+        });
     </script>
     <!-- Custom Logout Modal -->
     <div id="logoutModal" class="modal">
