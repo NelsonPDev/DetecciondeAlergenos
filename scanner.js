@@ -3,11 +3,86 @@
 let usuarioActual = null;
 let usuarioId = null;
 let historialEscaneos = [];
+let isScannerActive = false;
 
 // Verificar sesión y cargar datos al iniciar
 document.addEventListener('DOMContentLoaded', async function() {
     await verificarSesion();
+
+    const btnEscanear = document.getElementById('btn-escanear');
+    if (btnEscanear) {
+        btnEscanear.addEventListener('click', () => {
+            if (isScannerActive) {
+                detenerScanner();
+            } else {
+                iniciarScanner();
+            }
+        });
+    }
+
+    const inputCodigo = document.getElementById('codigoBarras');
+    if (inputCodigo) {
+        inputCodigo.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarProducto();
+            }
+        });
+    }
 });
+
+// Iniciar el escáner de código de barras
+function iniciarScanner() {
+    const scannerContainer = document.getElementById('scanner-container');
+    const btnEscanear = document.getElementById('btn-escanear');
+
+    scannerContainer.style.display = 'block';
+    btnEscanear.textContent = '📷 Detener Escáner';
+    isScannerActive = true;
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: scannerContainer,
+            constraints: {
+                width: 400,
+                height: 300,
+                facingMode: "environment"
+            },
+            frequency: 10, // Intentar procesar 10 fotogramas por segundo
+        },
+        decoder: {
+            readers: ["ean_reader"]
+        },
+        locate: true, // Habilitar la localización del código de barras
+    }, function(err) {
+        if (err) {
+            console.error('Error al iniciar Quagga:', err);
+            mostrarModalError('No se pudo iniciar la cámara. Asegúrate de tener los permisos necesarios.');
+            detenerScanner();
+            return;
+        }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(data => {
+        const codigo = data.codeResult.code;
+        document.getElementById('codigoBarras').value = codigo;
+        detenerScanner();
+        buscarProducto();
+    });
+}
+
+// Detener el escáner
+function detenerScanner() {
+    const scannerContainer = document.getElementById('scanner-container');
+    const btnEscanear = document.getElementById('btn-escanear');
+
+    Quagga.stop();
+    scannerContainer.style.display = 'none';
+    btnEscanear.textContent = '📷 Iniciar Escáner';
+    isScannerActive = false;
+}
 
 // Verificar sesión del usuario
 async function verificarSesion() {
@@ -325,14 +400,4 @@ async function cerrarSesion() {
     }
 }
 
-// Permitir buscar presionando Enter
-document.addEventListener('DOMContentLoaded', function() {
-    const inputCodigo = document.getElementById('codigoBarras');
-    if (inputCodigo) {
-        inputCodigo.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                buscarProducto();
-            }
-        });
-    }
-});
+

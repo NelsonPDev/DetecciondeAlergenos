@@ -6,11 +6,11 @@
     <title>Escáner de Alergenos - Detección de Alimentos</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .scanner-container {
+        .scanner-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .scanner-video {
@@ -19,6 +19,12 @@
             border: 3px solid #667eea;
             border-radius: 10px;
             background: #000;
+            overflow: hidden; /* Para ocultar el video que se desborda */
+        }
+        
+        .scanner-video video {
+            width: 100%;
+            height: auto;
         }
 
         .resultado-escaneo {
@@ -164,7 +170,7 @@
         }
 
         @media (max-width: 768px) {
-            .scanner-container {
+            .scanner-layout {
                 grid-template-columns: 1fr;
             }
 
@@ -283,7 +289,12 @@
             <section class="formulario-seccion">
                 <h2>Escanear Código de Barras</h2>
 
-                <div class="scanner-container">
+                <div class="main-container">
+                    <button id="btn-escanear" class="boton-escanear">📷 Iniciar Escáner</button>
+                    <div id="scanner-container" class="scanner-video" style="display: none;"></div>
+                </div>
+
+                <div class="scanner-layout">
                     <!-- Lado izquierdo: Entrada de código -->
                     <div>
                         <div class="grupo-formulario">
@@ -295,11 +306,11 @@
                                 placeholder="Ingresa o escanea el código de barras..."
                                 autocomplete="off"
                             >
-                            <small style="color: #666;">Escanea un código de barras o ingresa uno manualmente</small>
+                            <small style="color: #666;">El código detectado aparecerá aquí</small>
                         </div>
 
                         <button class="boton-escanear" onclick="buscarProducto()">🔍 Buscar Producto</button>
-                        <button class="boton-escanear" style="background: #17a2b8;" onclick="limpiarResultado()">🔄 Limpiar</button>
+                        <button class="boton-escanear" style="background: #777;" onclick="limpiarResultado()">🔄 Limpiar</button>
 
                         <!-- Historial de escaneos -->
                         <div class="historial-escaneos" id="historialContainer" style="display: none;">
@@ -348,6 +359,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js" integrity="sha512-bCsKsQXRqMv4i++VE+SPcUL2nMK+2A_9iBeBCvVUT/gsNYLITAFjoUinAJkGq/wHw2Nz2Hq1dI95gB5hP1T5PQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="scanner.js"></script>
 </body>
 </html>
