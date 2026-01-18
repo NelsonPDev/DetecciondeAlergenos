@@ -223,6 +223,7 @@ function mostrarResultado(data, codigo) {
         const producto = data.producto;
         html = `
             <h3>${producto.nombre}</h3>
+            ${producto.imagen ? `<img src="${producto.imagen}" alt="Imagen de ${producto.nombre}" style="max-width: 150px; height: auto; border-radius: 8px; margin-bottom: 15px;">` : ''}
             <div class="info-producto">
                 <p><strong>Marca:</strong> ${producto.marca || 'N/A'}</p>
                 <p><strong>Código de Barras:</strong> ${producto.codigo_barras}</p>

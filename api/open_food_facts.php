@@ -22,11 +22,21 @@ class OpenFoodFactsAPI {
         // Priorizar ingredientes en español, si no, usar el por defecto
         $ingredientes = $producto['ingredients_text_es'] ?? $producto['ingredients_text'] ?? 'No se encontró la lista de ingredientes.';
 
+        // Lógica mejorada para obtener la URL de la imagen (priorizando velocidad)
+        $imagen_url = null;
+        if (isset($producto['image_small_url']) && !empty($producto['image_small_url'])) {
+            $imagen_url = $producto['image_small_url'];
+        } elseif (isset($producto['image_front_url']) && !empty($producto['image_front_url'])) {
+            $imagen_url = $producto['image_front_url'];
+        } elseif (isset($producto['image_url']) && !empty($producto['image_url'])) {
+            $imagen_url = $producto['image_url'];
+        }
+
         return [
             'codigo_barras' => $codigo_barras,
             'nombre' => $producto['product_name_es'] ?? $producto['product_name'] ?? 'Producto sin nombre',
             'marca' => $producto['brands'] ?? 'Marca desconocida',
-            'imagen_url' => $producto['image_url'] ?? null,
+            'imagen_url' => $imagen_url,
             'alergenos' => $this->extraerAlergenos($producto),
             'ingredientes' => $ingredientes,
             'pais' => $producto['countries'] ?? null,
