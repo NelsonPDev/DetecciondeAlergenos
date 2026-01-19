@@ -237,6 +237,13 @@ function mostrarResultado(data, codigo) {
                     <strong>${data.mensaje_advertencia}</strong>
                 </div>
             `;
+        } else {
+            // Mensaje cuando el producto no contiene alergenos registrados por el usuario
+            html += `
+                <div style="background-color: #d4edda; color: #155724; border: 2px solid #28a745; padding: 20px; border-radius: 8px; margin-top: 15px; font-size: 1.1em; text-align: center;">
+                    <strong>¡Puedes consumirlo! Este producto no contiene ninguno de tus alérgenos registrados.</strong>
+                </div>
+            `;
         }
 
         // Listar todos los alérgenos detectados en el producto (para información)
