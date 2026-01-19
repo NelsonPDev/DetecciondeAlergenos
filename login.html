@@ -37,10 +37,7 @@
                         <div class="error-message" id="errorPassword"></div>
                     </div>
 
-                    <div class="remember-me">
-                        <input type="checkbox" id="recordarme" name="recordarme">
-                        <label for="recordarme">Recuérdame</label>
-                    </div>
+
 
                     <button type="submit" class="auth-button">Iniciar Sesión</button>
                 </form>
@@ -75,7 +72,7 @@
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const recordarme = document.getElementById('recordarme').checked;
+
 
             // Limpiar mensajes previos
             document.getElementById('mensajeError').style.display = 'none';
@@ -92,7 +89,7 @@
                 const formData = new FormData();
                 formData.append('email', email);
                 formData.append('password', password);
-                formData.append('recordarme', recordarme ? 'true' : 'false');
+
 
                 const response = await fetch('api/login.php', {
                     method: 'POST',
