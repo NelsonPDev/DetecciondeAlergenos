@@ -511,10 +511,75 @@ footer {
     }
 }
 
-/* Multi-step form styles */
-.progress-bar-container {
-    margin-bottom: 60px; /* Aumentado para dar espacio a las etiquetas */
+/* New styles for historial.html main content */
+.historial-main {
+    max-width: 800px;
+    margin: 30px auto;
     padding: 0 20px;
+}
+.historial-list-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.historial-list-container h2 {
+    font-size: 2em;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+.historial-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+.historial-item:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+.historial-imagen {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+.historial-info {
+    flex-grow: 1;
+    text-align: left;
+}
+.historial-info h4 {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 5px;
+}
+.historial-info p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 3px;
+}
+.historial-fecha {
+    font-size: 0.85em;
+    color: #999;
+    margin-left: 15px;
+    min-width: 120px; /* Adjust as needed */
+    text-align: right;
+}
+.alergia-detectada {
+    color: #dc3545; /* Red for detected allergens */
+    font-weight: bold;
+}
+.sin-alergia {
+    color: #28a745; /* Green for no allergens */
 }
 
 .progress-bar {

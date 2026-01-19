@@ -317,6 +317,26 @@
     <div class="historial-main">
         <div id="mensaje" class="mensaje"></div>
         <div class="historial-list-container">
+            <div id="filter-section" style="margin-bottom: 30px; padding: 20px; background: #f0f2f5; border-radius: 10px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: flex-end;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <label for="startDate" style="font-size: 0.9em; color: #555; margin-bottom: 5px;">Desde:</label>
+                    <input type="date" id="startDate" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em;">
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <label for="endDate" style="font-size: 0.9em; color: #555; margin-bottom: 5px;">Hasta:</label>
+                    <input type="date" id="endDate" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em;">
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <label for="searchQuery" style="font-size: 0.9em; color: #555; margin-bottom: 5px;">Buscar:</label>
+                    <input type="text" id="searchQuery" placeholder="Producto o alérgeno" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; min-width: 200px;">
+                </div>
+                <button id="applyFiltersBtn" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background 0.2s;">
+                    Aplicar Filtros
+                </button>
+                <button id="clearFiltersBtn" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background 0.2s;">
+                    Limpiar Filtros
+                </button>
+            </div>
             <h2>Productos Escaneados Recientemente</h2>
             <div id="historial-lista">
                 <!-- El historial se cargará aquí dinámicamente -->
