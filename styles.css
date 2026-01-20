@@ -837,4 +837,8 @@ footer {
         height: 30px;
         border-width: 2px;
     }
+
+    .form-group input {
+        padding: 14px 1px;
+    }
 }
