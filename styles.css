@@ -465,6 +465,13 @@ footer {
     }
 }
 
+/* Add space for desktop view in registration form */
+@media (min-width: 769px) {
+    .progress-bar-container {
+        margin-bottom: 40px;
+    }
+}
+
 
 /* Responsive Design */
 @media (max-width: 992px) {
@@ -736,4 +743,98 @@ footer {
     border-color: transparent;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     transform: translateY(-2px);
+}
+
+/* More Comprehensive Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .sidebar {
+        width: 250px;
+        left: -250px;
+    }
+
+    .header-principal {
+        padding: 15px 0;
+    }
+
+    .dashboard-main, .perfil-container, .historial-main {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .scanner-card, .historial-list-container, .perfil-container {
+        padding: 20px;
+    }
+
+    .camera-wrapper {
+        height: 300px;
+    }
+
+    .dos-columnas {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .historial-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .historial-fecha {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+
+    .progress-bar .step-label {
+        display: none; /* Ocultar etiquetas en móvil para limpiar la UI */
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 20px;
+    }
+
+    .login-image-panel {
+        display: none; /* Ocultar panel de imagen en pantallas muy pequeñas */
+    }
+
+    .scanner-header h2 {
+        font-size: 1.5em;
+    }
+
+    .camera-wrapper {
+        height: 250px;
+    }
+
+    .btn-scan {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .perfil-container {
+        padding: 15px;
+    }
+
+    .alergenos-lista {
+        grid-template-columns: 1fr;
+    }
+
+    .historial-list-container {
+        padding: 15px;
+    }
+
+    .historial-list-container h2 {
+        font-size: 1.5em;
+    }
+
+    .step-icon {
+        width: 30px;
+        height: 30px;
+        border-width: 2px;
+    }
 }
